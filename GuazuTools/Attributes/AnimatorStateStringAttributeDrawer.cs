@@ -9,8 +9,10 @@ using an = UnityEditor.Animations;
 public class AnimatorStateStringAttribute : PropertyAttribute
 {
     public bool buscarEnChildren = false;
+    public string buscarCampoEspecifico = "";
     public AnimatorStateStringAttribute() { }
     public AnimatorStateStringAttribute(bool buscarEnChildren) { this.buscarEnChildren = buscarEnChildren; }
+    public AnimatorStateStringAttribute(string buscarCampoEspecifico) { this.buscarCampoEspecifico = buscarCampoEspecifico; }
 }
 
 #if UNITY_EDITOR
@@ -20,8 +22,55 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
     readonly static GUIContent[] noMulti = new GUIContent[] { new GUIContent("Multiobject editing no permitido") };
     readonly static GUIContent[] noAnimator = new GUIContent[] { new GUIContent("Animator no hallado") };
     readonly static GUIContent[] noAnimCont = new GUIContent[] { new GUIContent("Animator sin Animator Controller") };
+    readonly static GUIContent[] noField = new GUIContent[] { new GUIContent("El campo que se quiere referenciar no se encuentra en este componente") };
+    readonly static GUIContent[] noFieldGameObj = new GUIContent[] { new GUIContent("El campo que se quiere referenciar debe ser un vinculo a un objeto") };
     readonly static GUIContent[] noBehav = new GUIContent[] { new GUIContent("No reconocido como behaviour") };
     readonly static GUIContent[] noGameObj = new GUIContent[] { new GUIContent("No asociado a GameObject") };
+
+    static GUIContent[] errorNoAnimator;
+    static Animator RecuperarAnimator(SerializedProperty property, AnimatorStateStringAttribute att, Behaviour beh)
+    {
+        errorNoAnimator = null;
+        if (string.IsNullOrEmpty(att.buscarCampoEspecifico))
+        {
+            Animator animator = beh.GetComponent<Animator>();
+            if (!animator)
+            {
+                if (att.buscarEnChildren) animator = beh.GetComponentInChildren<Animator>();
+            }
+            return animator;
+        }
+        else
+        {
+            SerializedProperty prop = property.serializedObject.FindProperty(att.buscarCampoEspecifico);
+            if (prop == null)
+            {
+                errorNoAnimator = noField;
+                return null;
+            }
+            else if (prop.propertyType == SerializedPropertyType.ObjectReference)
+            {
+                Object elOtro = prop.objectReferenceValue;
+                Animator esAnimator = elOtro as Animator;
+                if (!esAnimator)
+                {
+                    GameObject esGameObject = elOtro as GameObject;
+                    if (esGameObject) esAnimator = esGameObject.GetComponent<Animator>();
+                    else
+                    {
+                        Component esComponent = elOtro as Component;
+                        if (esComponent) esAnimator = esComponent.GetComponent<Animator>();
+                    }
+                }
+                return esAnimator;
+            }
+            else
+            {
+                errorNoAnimator = noGameObj;
+                return null;
+            }
+        }
+    }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
@@ -44,12 +93,12 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
                 }
                 else if (beh.gameObject)
                 {
-                    Animator animator = beh.GetComponent<Animator>();
+                    Animator animator = RecuperarAnimator(property, attribute as AnimatorStateStringAttribute, beh);/*beh.GetComponent<Animator>();
                     if (!animator)
                     {
                         AnimatorStateStringAttribute aVarAtt = attribute as AnimatorStateStringAttribute;
                         if (aVarAtt.buscarEnChildren) animator = beh.GetComponentInChildren<Animator>();
-                    }
+                    }*/
                     if (animator)
                     {
                         string[] anims = AnimatorListaDeEstados.ListaDeEstados(animator);
@@ -67,7 +116,7 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
                             }
                         }
                     }
-                    else EditorGUI.Popup(position, -1, noAnimator);
+                    else EditorGUI.Popup(position, -1, errorNoAnimator==null? noAnimator:errorNoAnimator);
                 }
                 else EditorGUI.Popup(position, -1, noGameObj);
             }

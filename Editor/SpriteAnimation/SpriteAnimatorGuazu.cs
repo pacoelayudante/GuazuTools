@@ -25,6 +25,7 @@ public class SpriteAnimatorGuazu : EditorWindow
         textoInterrumpir = "Hacela mierda nomas",
         textoNoInterrumpir = "[WIP] ¡Uy, espera! [WIP]";
 
+    static readonly string urlIconos = "Assets/GuazuTools/Editor/Editor Default Resources";
     static float escalaVistaPrevia = .25f;
     static bool generarGUISkins = true, estirarPreview = false;
     static GUIContent texPlay, texPausa, texEliOff, texEliOn, texDupOff, texDupOn;
@@ -115,10 +116,10 @@ public class SpriteAnimatorGuazu : EditorWindow
         generarGUISkins = false;
         if (texPlay == null) texPlay = new GUIContent(EditorGUIUtility.FindTexture("PlayButton"));
         if (texPlay == null) texPausa = new GUIContent(EditorGUIUtility.FindTexture("PauseButton"));
-        if (texEliOff == null) texEliOff = new GUIContent((Texture)EditorGUIUtility.LoadRequired("GuazuTools/iconotachooff.png"));
-        if (texEliOn == null) texEliOn = new GUIContent((Texture)EditorGUIUtility.LoadRequired("GuazuTools/iconotachoon.png"));
-        if (texDupOff == null) texDupOff = new GUIContent((Texture)EditorGUIUtility.LoadRequired("GuazuTools/iconoduplicaroff.png"));
-        if (texDupOn == null) texDupOn = new GUIContent((Texture)EditorGUIUtility.LoadRequired("GuazuTools/iconoduplicaron.png"));
+        if (texEliOff == null) texEliOff = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos+"/iconotachooff.png"));
+        if (texEliOn == null) texEliOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos + "/iconotachoon.png"));
+        if (texDupOff == null) texDupOff = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos + "/iconoduplicaroff.png"));
+        if (texDupOn == null) texDupOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos + "/iconoduplicaron.png"));
         stiloFrameApagado = "flow node 0";
           stiloFrameNormal =  "flow node 1" ;
           stiloFrameElegido = "flow node 3 on";
