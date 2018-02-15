@@ -20,15 +20,15 @@ public class AnimatorStateStringAttribute : PropertyAttribute
 public class AnimatorStateStringAttributeDrawer : PropertyDrawer
 {
     readonly static GUIContent[] noMulti = new GUIContent[] { new GUIContent("Multiobject editing no permitido") };
-    readonly static GUIContent[] noAnimator = new GUIContent[] { new GUIContent("Animator no hallado") };
-    readonly static GUIContent[] noAnimCont = new GUIContent[] { new GUIContent("Animator sin Animator Controller") };
+    readonly static GUIContent[] noAnimator = new GUIContent[] { new GUIContent("Animator no hallado o hallado pero sin Animator Controller") };
+    //readonly static GUIContent[] noAnimCont = new GUIContent[] { new GUIContent("Animator sin Animator Controller") };
     readonly static GUIContent[] noField = new GUIContent[] { new GUIContent("El campo que se quiere referenciar no se encuentra en este componente") };
     readonly static GUIContent[] noFieldGameObj = new GUIContent[] { new GUIContent("El campo que se quiere referenciar debe ser un vinculo a un objeto") };
     readonly static GUIContent[] noBehav = new GUIContent[] { new GUIContent("No reconocido como behaviour") };
-    readonly static GUIContent[] noGameObj = new GUIContent[] { new GUIContent("No asociado a GameObject") };
+    readonly static GUIContent[] noGameObj = new GUIContent[] { new GUIContent("No asociado a Objeto") };
 
     static GUIContent[] errorNoAnimator;
-    static Animator RecuperarAnimator(SerializedProperty property, AnimatorStateStringAttribute att, Behaviour beh)
+    static an.AnimatorController RecuperarAnimator(SerializedProperty property, AnimatorStateStringAttribute att, Behaviour beh)
     {
         errorNoAnimator = null;
         if (string.IsNullOrEmpty(att.buscarCampoEspecifico))
@@ -38,7 +38,8 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
             {
                 if (att.buscarEnChildren) animator = beh.GetComponentInChildren<Animator>();
             }
-            return animator;
+            if (animator) return animator.runtimeAnimatorController as an.AnimatorController;
+            return null;
         }
         else
         {
@@ -51,6 +52,8 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
             else if (prop.propertyType == SerializedPropertyType.ObjectReference)
             {
                 Object elOtro = prop.objectReferenceValue;
+                an.AnimatorController esController = elOtro as an.AnimatorController;
+                if (esController) return esController;
                 Animator esAnimator = elOtro as Animator;
                 if (!esAnimator)
                 {
@@ -62,7 +65,8 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
                         if (esComponent) esAnimator = esComponent.GetComponent<Animator>();
                     }
                 }
-                return esAnimator;
+                if (esAnimator) return esAnimator.runtimeAnimatorController as an.AnimatorController;
+                else return null;
             }
             else
             {
@@ -84,7 +88,7 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
             {
                 EditorGUI.Popup(position, -1, noMulti);
             }
-            else if(property.serializedObject.targetObject)
+            else if (property.serializedObject.targetObject)
             {
                 Behaviour beh = property.serializedObject.targetObject as Behaviour;
                 if (!beh)
@@ -93,17 +97,11 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
                 }
                 else if (beh.gameObject)
                 {
-                    Animator animator = RecuperarAnimator(property, attribute as AnimatorStateStringAttribute, beh);/*beh.GetComponent<Animator>();
-                    if (!animator)
+                    an.AnimatorController animatorController = RecuperarAnimator(property, attribute as AnimatorStateStringAttribute, beh);
+
+                    if (animatorController)
                     {
-                        AnimatorStateStringAttribute aVarAtt = attribute as AnimatorStateStringAttribute;
-                        if (aVarAtt.buscarEnChildren) animator = beh.GetComponentInChildren<Animator>();
-                    }*/
-                    if (animator)
-                    {
-                        string[] anims = AnimatorListaDeEstados.ListaDeEstados(animator);
-                        if (anims == null) EditorGUI.Popup(position, -1, noAnimCont);
-                        else
+                        string[] anims = AnimatorListaDeEstados.ListaDeEstados(animatorController);
                         {
                             int sel = 0;
                             for (sel = 0; sel < anims.Length; sel++) { if (anims[sel].Equals(property.stringValue)) break; }
@@ -116,7 +114,7 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
                             }
                         }
                     }
-                    else EditorGUI.Popup(position, -1, errorNoAnimator==null? noAnimator:errorNoAnimator);
+                    else EditorGUI.Popup(position, -1, errorNoAnimator == null ? noAnimator : errorNoAnimator);
                 }
                 else EditorGUI.Popup(position, -1, noGameObj);
             }
@@ -136,15 +134,23 @@ public static class AnimatorListaDeEstados
         {
             if (anim.runtimeAnimatorController)
             {
-                List<string> resultados = new List<string>();
-                an.AnimatorController cont = anim.runtimeAnimatorController as an.AnimatorController;
-                foreach (an.AnimatorControllerLayer lay in cont.layers)
-                {
-                    AgregarEstadosRecursivo(resultados, lay.stateMachine);
-                }
-                return resultados.ToArray();
+                return ListaDeEstados(anim.runtimeAnimatorController as an.AnimatorController);
             }
             else return null;
+        }
+        else return null;
+    }
+
+    public static string[] ListaDeEstados(an.AnimatorController cont)
+    {
+        if (cont)
+        {
+            List<string> resultados = new List<string>();
+            foreach (an.AnimatorControllerLayer lay in cont.layers)
+            {
+                AgregarEstadosRecursivo(resultados, lay.stateMachine);
+            }
+            return resultados.ToArray();
         }
         else return null;
     }
