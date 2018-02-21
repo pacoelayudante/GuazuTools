@@ -23,6 +23,14 @@ public class GuazuGizmoSpawner : MonoBehaviour
 #endif
     }
 
+    public static void DibujarCaja(Vector3 posicion, Vector3 tam, Color color, float duracion = 0)
+    {
+#if UNITY_EDITOR
+        Gizmito g = new Caja(posicion, tam, color);
+        if (duracion > 0) g.duracion = duracion;
+#endif
+    }
+
 
 
 #if UNITY_EDITOR
@@ -79,6 +87,24 @@ public class GuazuGizmoSpawner : MonoBehaviour
             //Gizmos.DrawWireCube(posicion, Vector3.one* HandleUtility.GetHandleSize(posicion) * .1f);
             Handles.color = color;
             Handles.CircleHandleCap(-1, posicion, Quaternion.identity,radio, EventType.Repaint);
+        }
+    }
+
+    class Caja : Gizmito
+    {
+        Color color;
+        Vector3 posicion;
+        Vector3 tam;
+        public Caja(Vector3 posicion, Vector3 tam, Color color)
+        {
+            this.posicion = posicion;
+            this.tam = tam;
+            this.color = color;
+        }
+        public override void Dibujar(SceneView sceneView)
+        {
+            Handles.color = color;
+            Handles.DrawWireCube(posicion, tam);
         }
     }
 
