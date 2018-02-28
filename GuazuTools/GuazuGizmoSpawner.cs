@@ -7,27 +7,43 @@ using UnityEditor;
 
 public class GuazuGizmoSpawner : MonoBehaviour
 {
-    public static void DibujarFlecha(Vector3 posicion, Vector3 direccion, Color color, float duracion = 0)
+    public static void DibujarTexto(string texto, Vector3 posicion, Color color, float duracion = -1)
+    {
+#if UNITY_EDITOR
+        Gizmito g = new Texto(texto, posicion, color);
+        if (duracion >= 0) g.duracion = duracion;
+#endif
+    }
+
+    public static void DibujarLinea(Vector3 a, Vector3 b, Color color, float duracion = -1)
+    {
+#if UNITY_EDITOR
+        Gizmito g = new Linea(a, b, color);
+        if (duracion >= 0) g.duracion = duracion;
+#endif
+    }
+
+    public static void DibujarFlecha(Vector3 posicion, Vector3 direccion, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
         Gizmito g = new Flecha(posicion, direccion, color);
-        if (duracion > 0) g.duracion = duracion;
+        if (duracion >= 0) g.duracion = duracion;
 #endif
     }
 
-    public static void DibujarCirculo(Vector3 posicion, float radio, Color color, float duracion = 0)
+    public static void DibujarCirculo(Vector3 posicion, float radio, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
         Gizmito g = new Circulo(posicion, radio, color);
-        if (duracion > 0) g.duracion = duracion;
+        if (duracion >= 0) g.duracion = duracion;
 #endif
     }
 
-    public static void DibujarCaja(Vector3 posicion, Vector3 tam, Color color, float duracion = 0)
+    public static void DibujarCaja(Vector3 posicion, Vector3 tam, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
         Gizmito g = new Caja(posicion, tam, color);
-        if (duracion > 0) g.duracion = duracion;
+        if (duracion >= 0) g.duracion = duracion;
 #endif
     }
 
@@ -82,9 +98,6 @@ public class GuazuGizmoSpawner : MonoBehaviour
         }
         public override void Dibujar(SceneView sceneView)
         {
-            //Gizmos.color = color;
-            //Gizmos.DrawLine(posicion, posicion + direccion);
-            //Gizmos.DrawWireCube(posicion, Vector3.one* HandleUtility.GetHandleSize(posicion) * .1f);
             Handles.color = color;
             Handles.CircleHandleCap(-1, posicion, Quaternion.identity,radio, EventType.Repaint);
         }
@@ -108,6 +121,23 @@ public class GuazuGizmoSpawner : MonoBehaviour
         }
     }
 
+    class Texto : Gizmito
+    {
+        GUIStyle style = new GUIStyle();
+        Vector3 posicion;
+        string texto;
+        public Texto(string texto, Vector3 posicion, Color color)
+        {
+            this.texto = texto;
+            this.posicion = posicion;
+            style.normal.textColor = color;
+        }
+        public override void Dibujar(SceneView sceneView)
+        {
+            Handles.Label(posicion, texto, style);
+        }
+    }
+
     class Flecha : Gizmito
     {
         Color color;
@@ -121,11 +151,26 @@ public class GuazuGizmoSpawner : MonoBehaviour
         }
         public override void Dibujar(SceneView sceneView)
         {
-            //Gizmos.color = color;
-            //Gizmos.DrawLine(posicion, posicion + direccion);
-            //Gizmos.DrawWireCube(posicion, Vector3.one* HandleUtility.GetHandleSize(posicion) * .1f);
             Handles.color = color;
             Handles.ArrowHandleCap(-1, posicion, Quaternion.LookRotation(direccion), HandleUtility.GetHandleSize(posicion) * .3f,EventType.Repaint);            
+        }
+    }
+
+    class Linea : Gizmito
+    {
+        Color color;
+        Vector3 puntoA;
+        Vector3 puntoB;
+        public Linea(Vector3 puntoA, Vector3 puntoB, Color color)
+        {
+            this.puntoA = puntoA;
+            this.puntoB = puntoB;
+            this.color = color;
+        }
+        public override void Dibujar(SceneView sceneView)
+        {
+            Handles.color = color;
+            Handles.DrawLine(puntoA,puntoB);
         }
     }
 #endif
