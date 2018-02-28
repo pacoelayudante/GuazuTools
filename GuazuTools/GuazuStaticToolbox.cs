@@ -19,6 +19,11 @@ public static class Guazu {
     {
         return Quaternion.Euler( 0, 0, Mathf.Atan2( vec2.y, vec2.x )*Mathf.Rad2Deg );
     }
+
+    public static Vector2 Vector2DesdeAngulo(float grados)
+    {
+        return new Vector2(Mathf.Cos(Mathf.Deg2Rad*grados), Mathf.Sin(Mathf.Deg2Rad*grados));
+    }
     
     public static Color BlancoClear
     {
