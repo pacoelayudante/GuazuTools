@@ -22,9 +22,13 @@ public static class Guazu {
 
     public static Vector2 Vector2DesdeAngulo(float grados)
     {
-        return new Vector2(Mathf.Cos(Mathf.Deg2Rad*grados), Mathf.Sin(Mathf.Deg2Rad*grados));
+        return new Vector2(Mathf.Cos(Mathf.Deg2Rad * grados), Mathf.Sin(Mathf.Deg2Rad * grados));
     }
-    
+    public static float AnguloDesdeVector2(Vector2 vector)
+    {
+        return Mathf.Atan2(vector.y,vector.x);
+    }
+
     public static Color BlancoClear
     {
         get { return new Color(1f, 1f, 1f, 0f); }
