@@ -86,7 +86,7 @@ public class AcomodaSprites : EditorWindow
                     Handles.DrawLine(-Vector3.up * esc, Vector3.up * esc);
                     EditorGUI.BeginChangeCheck();
                     freeMoveHandlePos = Handles.Slider2D(freeMoveHandlePos, Vector3.forward, Vector3.right, Vector3.up,
-                        esc*3, Handles.RectangleCap, 0);
+                        esc*3, Handles.RectangleHandleCap, 0);
                     if (EditorGUI.EndChangeCheck())
                     {
                         Repaint();
