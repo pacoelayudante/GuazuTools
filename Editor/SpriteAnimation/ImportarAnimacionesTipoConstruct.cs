@@ -46,7 +46,7 @@ public class ImportarAnimacionesTipoConstruct : EditorWindow {
                 {
                     EditorUtility.DisplayProgressBar("Generando Animaciones", "Compilando ("+clip.name+")", carga += 1f/animaciones.Count);
                     animator.AddMotion(clip);
-                    AssetDatabase.CreateAsset(clip, urlAnimacionesImportadas + "/" + carpetaElegida.name + "/" + clip.name + ".anim");
+                    AssetDatabase.CreateAsset(clip, urlAnimacionesImportadas + "/" + carpetaElegida.name + "/" +carpetaElegida.name+"_"+ clip.name + ".anim");
                 }
                 EditorUtility.DisplayProgressBar("Generando Animaciones", "Actualizando", carga);
                 AssetDatabase.SaveAssets();
