@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-//MODO DE USO v.02
+//MODO DE USO v.03
 // >> (opcional) Se elige Animator
 // >> Se elige AnimationClip (de manera comun o usando popup generado por Animator)
 // >> (opcional) Se prueba exclusividad de sprites (esto se fija si dentro del
@@ -15,6 +15,7 @@ using System.Collections.Generic;
 // >> "Aplicar" hace lo obvio, pero guarda que no hay UNDO!
 //    Si queremos revertir, aplicamos el offset invertido (por eso te recuerda el recien aplicado)
 //
+// --fix solo probado con import mode single
 // by Paco (pacoelayudante@gmail.com)
 // https://gist.github.com/pacoelayudante
 //
@@ -35,6 +36,24 @@ public class AcomodaSprites : EditorWindow
     List<Sprite> sprites = new List<Sprite>();
     int keyFrameSeleccionado = 0;
     ObjectReferenceKeyframe[] keyframes;
+
+    Sprite SpriteVisualizado
+    {
+        get
+        {
+            if (keyframes != null || sprites.Count > 0)
+            {
+                if (keyframes == null ? sprites.Count > 0 : keyframes.Length > keyFrameSeleccionado)
+                {
+                    if (keyframes == null ? sprites[keyFrameSeleccionado] : keyframes[keyFrameSeleccionado].value != null)
+                    {
+                        return (keyframes == null ? sprites[keyFrameSeleccionado] : keyframes[keyFrameSeleccionado].value) as Sprite;
+                    }
+                }
+            }
+            return null;
+        }
+    }
 
     [MenuItem("Guazu/Acomoda Sprites")]
     public static void ShowWindow()
@@ -152,6 +171,9 @@ public class AcomodaSprites : EditorWindow
 
         EditorGUI.BeginChangeCheck();
         animClip = EditorGUILayout.ObjectField("Clip", animClip, typeof(AnimationClip), false) as AnimationClip;
+        GUI.enabled = false;
+        EditorGUILayout.ObjectField("Sprite", SpriteVisualizado, typeof(Sprite), false,GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        GUI.enabled = true;
         if (EditorGUI.EndChangeCheck()) exclusividad = 0;
 
         if (listaClips != null)
@@ -225,6 +247,8 @@ public class AcomodaSprites : EditorWindow
         }
         GUI.enabled = false;
         EditorGUILayout.Vector2Field("Offset aplicado", memoriaMoveHandlePos);
+        EditorGUILayout.Vector2Field("Tamaño Sprite", SpriteVisualizado?SpriteVisualizado.rect.size:Vector2.zero);
+        EditorGUILayout.Vector2Field("Pivot Actual", SpriteVisualizado ? SpriteVisualizado.pivot : Vector2.zero);
         GUI.enabled = (keyframes==null? (sprites.Count > keyFrameSeleccionado) : keyframes.Length > keyFrameSeleccionado) && freeMoveHandlePos != Vector2.zero;
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Cancelar")) {
@@ -241,7 +265,9 @@ public class AcomodaSprites : EditorWindow
     {
         float f = 0;
         List<TextureImporter> tImps = new List<TextureImporter>();
-        foreach(Sprite s in sprites)
+        Vector2 offsetSpriteVisible = -freeMoveHandlePos * SpriteVisualizado.pixelsPerUnit;
+         offsetSpriteVisible += SpriteVisualizado ? SpriteVisualizado.pivot : Vector2.zero;
+        foreach (Sprite s in sprites)
         {
             if (s == null) continue;
 
@@ -253,18 +279,21 @@ public class AcomodaSprites : EditorWindow
             {
                 TextureImporterSettings tis = new TextureImporterSettings();
                 ti.ReadTextureSettings(tis);
-                if (tis.spriteAlignment == (int)SpriteAlignment.Custom)
+                //if (tis.spriteAlignment == (int)SpriteAlignment.Custom)
                 {
-                    tis.spritePivot -=
-                        new Vector2(freeMoveHandlePos.x / s.rect.size.x
-                        , freeMoveHandlePos.y / s.rect.size.y);
+                    tis.spritePivot=new Vector2(offsetSpriteVisible.x / s.rect.size.x, offsetSpriteVisible.y / s.rect.size.y);
+                    /*tis.spritePivot = offsetSpriteVisible 
+                        - (new Vector2(
+                        freeMoveHandlePos.x / s.rect.size.x
+                        , freeMoveHandlePos.y  / s.rect.size.y)
+                        ) * s.pixelsPerUnit;*/
                 }
-                else
+                /*else
                 {
                     tis.spritePivot =
                         new Vector2(freeMoveHandlePos.x / s.rect.size.x
                         , freeMoveHandlePos.y / s.rect.size.y);
-                }
+                }*/
                 tis.spriteAlignment = (int)SpriteAlignment.Custom;
                 ti.SetTextureSettings(tis);
             }
@@ -275,6 +304,7 @@ public class AcomodaSprites : EditorWindow
                 {
                     if (metas[i].name.Equals(s.name))
                     {
+                        metas[i].pivot = new Vector2(offsetSpriteVisible.x / s.rect.size.x, offsetSpriteVisible.y / s.rect.size.y);/*
                         if (metas[i].alignment == (int)SpriteAlignment.Custom)
                         {
                             metas[i].pivot -=
@@ -287,7 +317,7 @@ public class AcomodaSprites : EditorWindow
                                 new Vector2(freeMoveHandlePos.x / s.rect.size.x
                                 , freeMoveHandlePos.y / s.rect.size.y);
                         }
-                        metas[i].alignment = (int)SpriteAlignment.Custom;
+                        metas[i].alignment = (int)SpriteAlignment.Custom;*/
                         break;
                     }
                 }
