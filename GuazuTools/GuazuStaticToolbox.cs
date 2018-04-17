@@ -36,7 +36,11 @@ public static class Guazu {
 
     public static Color ColorClear(Color c)
     {
-        c.a = 0f;
+        return ColorAlfa(c,0f);
+    }
+    public static Color ColorAlfa(Color c, float alfa)
+    {
+        c.a = alfa;
         return c;
     }
 }

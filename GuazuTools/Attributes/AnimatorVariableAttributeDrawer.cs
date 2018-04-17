@@ -52,6 +52,7 @@ public class AnimatorVariableAttributeDrawer : PropertyDrawer
             else if (prop.propertyType == SerializedPropertyType.ObjectReference)
             {
                 Object elOtro = prop.objectReferenceValue;
+                if (!elOtro) return null;
                 an.AnimatorController esController = elOtro as an.AnimatorController;
                 if (esController) return esController;
                 Animator esAnimator = elOtro as Animator;
