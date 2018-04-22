@@ -6,7 +6,8 @@ Shader "Sprites/Blend Generico"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
-        [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
+			[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
+			[MaterialToggle] SoloAlfa("Sprite solo usa alfa", Float) = 0
         [HideInInspector] _RendererColor ("RendererColor", Color) = (1,1,1,1)
         [HideInInspector] _Flip ("Flip", Vector) = (1,1,1,1)
         [PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
@@ -35,12 +36,26 @@ Shader "Sprites/Blend Generico"
         {
         CGPROGRAM
             #pragma vertex SpriteVert
-            #pragma fragment SpriteFrag
+            #pragma fragment SpriteFragPuedeMonocromo
             #pragma target 2.0
             #pragma multi_compile_instancing
-            #pragma multi_compile _ PIXELSNAP_ON
+			#pragma multi_compile _ PIXELSNAP_ON
+			#pragma multi_compile _ SOLOALFA_ON
             #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             #include "UnitySprites.cginc"
+
+		fixed4 SpriteFragPuedeMonocromo(v2f IN) : SV_Target
+		{
+#ifdef SOLOALFA_ON
+			fixed4 c = IN.color;
+		c.a = SampleSpriteTexture(IN.texcoord).a;
+#else
+			fixed4 c = SampleSpriteTexture(IN.texcoord)*IN.color;
+#endif
+		c.rgb *= c.a;
+		return c;
+		}
+
         ENDCG
         }
     }
