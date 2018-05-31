@@ -20,6 +20,13 @@ public static class Guazu {
         return Quaternion.Euler( 0, 0, Mathf.Atan2( vec2.y, vec2.x )*Mathf.Rad2Deg );
     }
 
+    public static Quaternion MirrorQuaternion(Quaternion q)
+    {
+        q.x *= -1;
+        q.w *= -1;
+        return q;
+    }
+
     public static Vector2 Vector2DesdeAngulo(float grados)
     {
         return new Vector2(Mathf.Cos(Mathf.Deg2Rad * grados), Mathf.Sin(Mathf.Deg2Rad * grados));

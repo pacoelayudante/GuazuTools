@@ -13,5 +13,10 @@ public class GuazuAyuditasEditor : EditorWindow {
             EditorGUIUtility.systemCopyBuffer = AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs[0]);
         }
     }
+    [MenuItem("Assets/Copiar Path De Asset %w",true)]
+    public static bool CopiarPathDeAssetValidator()
+    {
+        return (Selection.assetGUIDs.Length > 0);
+    }
 
 }
