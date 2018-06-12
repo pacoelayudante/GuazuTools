@@ -255,13 +255,20 @@ public class AcomodaSprites : EditorWindow
             freeMoveHandlePos = Vector2.zero;
             SceneView.RepaintAll();
         }
-        if (GUILayout.Button("Aplicar")) {
-            Aplicar();
+        if (GUILayout.Button("Aplicar Todos Los Frames"))
+        {
+            Aplicar(sprites);
         }
+        GUI.enabled = SpriteVisualizado&&GUI.enabled;
+        if (GUILayout.Button("Aplicar Solo Este Frame"))
+        {
+            Aplicar( new List<Sprite>( new Sprite[] { SpriteVisualizado} ) );
+        }
+        GUI.enabled = true;
         GUILayout.EndHorizontal();
     }
-
-    void Aplicar()
+    
+    void Aplicar(List<Sprite> sprites)
     {
         float f = 0;
         List<TextureImporter> tImps = new List<TextureImporter>();
