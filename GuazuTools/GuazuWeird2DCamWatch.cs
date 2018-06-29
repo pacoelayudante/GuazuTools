@@ -9,7 +9,7 @@ public class GuazuWeird2DCamWatch : MonoBehaviour {
     {get{if (!camara) camara = GetComponent<Camera>();return camara; }}
 
     public Transform objetivo;
-    public float velocidadMaxima = 1f, aceleracion = 10f, desaceleracion = 30f, radioCentral = 0.25f, bordeActivador = .3f;
+    public float velocidadMaxima = 15f, aceleracion = 75f, desaceleracion = 150f, radioCentral = 0.6f, bordeActivador = .8f;
     float velocidad;
 
     bool yendo;
