@@ -50,4 +50,23 @@ public static class Guazu {
         c.a = alfa;
         return c;
     }
+
+    public static Mesh MeshDeSprite(Sprite sprite)
+    {
+        Mesh m = new Mesh();
+        return MeshDeSprite(sprite, m);
+    }
+    public static Mesh MeshDeSprite(Sprite sprite, Mesh destino)
+    {
+        Vector2[] spV = sprite.vertices;
+        Vector3[] v = new Vector3[spV.Length];
+        ushort[] spT = sprite.triangles;
+        int[] t = new int[spT.Length];
+        for (int i = 0; i < v.Length; i++) v[i] = spV[i];
+        for (int i = 0; i < t.Length; i++) t[i] = spT[i];
+        destino.vertices = v;
+        destino.uv = sprite.uv;
+        destino.triangles = t;
+        return destino;
+    }
 }
