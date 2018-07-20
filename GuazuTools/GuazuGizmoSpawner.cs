@@ -7,9 +7,37 @@ using UnityEditor;
 
 public class GuazuGizmoSpawner : MonoBehaviour
 {
+#if UNITY_EDITOR
+    [InitializeOnLoadMethod]
+    static void LoadEstadoActivo()
+    {
+        activo = EditorPrefs.GetBool("GuazuGizmoSpawner.Activo",true);
+    }
+
+    [MenuItem("Guazu/Gizmos Guazu Visibles")]
+    static void CambiarEstadoActivo()
+    {
+        Activo = !Activo;
+    }
+    [MenuItem("Guazu/Gizmos Guazu Visibles", true)]
+    public static bool CambiarEstadoActivoValidate()
+    {
+        Menu.SetChecked("Guazu/Gizmos Guazu Visibles", Activo);
+        return true;
+    }
+
+    public static bool Activo
+    {
+        get { return activo; }
+        set { EditorPrefs.SetBool("GuazuGizmoSpawner.Activo", activo = value); }
+    }
+    static bool activo=true;
+#endif
+
     public static void DibujarTexto(string texto, Vector3 posicion, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
+        if (!Activo) return;
         Gizmito g = new Texto(texto, posicion, color);
         if (duracion >= 0) g.duracion = duracion;
 #endif
@@ -18,6 +46,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
     public static void DibujarLinea(Vector3 a, Vector3 b, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
+        if (!Activo) return;
         Gizmito g = new Linea(a, b, color);
         if (duracion >= 0) g.duracion = duracion;
 #endif
@@ -26,6 +55,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
     public static void DibujarFlecha(Vector3 posicion, Vector3 direccion, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
+        if (!Activo) return;
         Gizmito g = new Flecha(posicion, direccion, color);
         if (duracion >= 0) g.duracion = duracion;
 #endif
@@ -34,6 +64,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
     public static void DibujarCirculo(Vector3 posicion, float radio, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
+        if (!Activo) return;
         Gizmito g = new Circulo(posicion, radio, color);
         if (duracion >= 0) g.duracion = duracion;
 #endif
@@ -42,6 +73,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
     public static void DibujarCaja(Vector3 posicion, Vector3 tam, Color color, float duracion = -1)
     {
 #if UNITY_EDITOR
+        if (!Activo) return;
         Gizmito g = new Caja(posicion, tam, color);
         if (duracion >= 0) g.duracion = duracion;
 #endif
