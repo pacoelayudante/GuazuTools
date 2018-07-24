@@ -7,4 +7,8 @@ public class AccionesGenerales : MonoBehaviour {
     {
         if (go) Destroy(go);
     }
+    public void Spawnear(GameObject go)
+    {
+        if (go) Instantiate(go,transform.position,transform.rotation);
+    }
 }
