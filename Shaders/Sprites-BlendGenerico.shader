@@ -6,14 +6,16 @@ Shader "Sprites/Blend Generico"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
-			[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
-			[MaterialToggle] SoloAlfa("Sprite solo usa alfa", Float) = 0
+		[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
+		[MaterialToggle] SoloAlfa("Ignora RGB de Sprite", Int) = 0
+		[MaterialToggle] IgnoraRendAlfa("Ignora Alfa del Renderer", Int) = 0
+		[MaterialToggle] Premultiply("Premultiply Alfa y Color", Int) = 1
         [HideInInspector] _RendererColor ("RendererColor", Color) = (1,1,1,1)
         [HideInInspector] _Flip ("Flip", Vector) = (1,1,1,1)
         [PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
         [PerRendererData] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
-			[Enum(UnityEngine.Rendering.BlendMode)] _BlendSrc("Blend Source", Int)=1
-			[Enum(UnityEngine.Rendering.BlendMode)] _BlendDst("Blend Dest",Int)=10
+		[Enum(UnityEngine.Rendering.BlendMode)] _BlendSrc("Blend Source", Int)=1
+		[Enum(UnityEngine.Rendering.BlendMode)] _BlendDst("Blend Dest",Int)=10
     }
 
     SubShader
@@ -36,24 +38,37 @@ Shader "Sprites/Blend Generico"
         {
         CGPROGRAM
             #pragma vertex SpriteVert
-            #pragma fragment SpriteFragPuedeMonocromo
+            #pragma fragment SpriteFragBlendGenerico
             #pragma target 2.0
             #pragma multi_compile_instancing
 			#pragma multi_compile _ PIXELSNAP_ON
 			#pragma multi_compile _ SOLOALFA_ON
+			#pragma multi_compile _ PREMULTIPLY_ON
+			#pragma multi_compile _ IGNORARENDALFA_ON
             #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             #include "UnitySprites.cginc"
 
-		fixed4 SpriteFragPuedeMonocromo(v2f IN) : SV_Target
+		fixed4 SpriteFragBlendGenerico(v2f IN) : SV_Target
 		{
 #ifdef SOLOALFA_ON
 			fixed4 c = IN.color;
-		c.a = SampleSpriteTexture(IN.texcoord).a;
+	#if IGNORARENDALFA_ON
+			c.a = SampleSpriteTexture(IN.texcoord).a;
+	#else
+			c.a *= SampleSpriteTexture(IN.texcoord).a;
+	#endif
 #else
-			fixed4 c = SampleSpriteTexture(IN.texcoord)*IN.color;
+			fixed4 c = SampleSpriteTexture(IN.texcoord);
+	#if IGNORARENDALFA_ON
+			c.rgb *= IN.color.rgb;
+	#else
+			c *= IN.color;
+	#endif
 #endif
-		c.rgb *= c.a;
-		return c;
+#if PREMULTIPLY_ON
+			c.rgb *= c.a;
+#endif
+			return c;
 		}
 
         ENDCG
