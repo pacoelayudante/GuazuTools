@@ -78,15 +78,20 @@ public class AgrupadorGuazu : EditorWindow {
 
     void Realizar()
     {
-        GameObject nuevo = new GameObject(nombreNuevo);
-        if (padre) nuevo.transform.SetParent(padre,false);
-        Undo.RecordObjects(objetosAgrupados, "Agrupar en " + nombreNuevo);
+        Transform nuevoPadre = new GameObject(nombreNuevo).transform;
+        Bounds b = new Bounds(objetosAgrupados[0].position,Vector3.zero);
+        foreach (var t in objetosAgrupados) b.Encapsulate(t.position);
+        nuevoPadre.position = b.center;
+        if (padre) nuevoPadre.transform.SetParent(padre);
+        Undo.RegisterCreatedObjectUndo(nuevoPadre.gameObject, "Agrupar en " + nombreNuevo);
+        //Undo.RecordObjects(objetosAgrupados, "Agrupar en " + nombreNuevo);
         foreach (Transform t in objetosAgrupados)
         {
-            t.SetParent(nuevo.transform);
+            Undo.SetTransformParent(t, nuevoPadre, "Agrupar en " + nombreNuevo);
+            //t.SetParent(nuevo.transform);
         }
-        Undo.RegisterCreatedObjectUndo(nuevo, "Agrupar en " + nombreNuevo);
-        EditorGUIUtility.PingObject(nuevo);
+        Selection.activeGameObject = nuevoPadre.gameObject;
+        EditorGUIUtility.PingObject(nuevoPadre);
         this.Close();
     }
 }
