@@ -6,11 +6,11 @@ using UnityEditor;
 #endif
 
 [System.Serializable]
-public struct GuazuPlayerPrefsVariable
+public class GuazuPlayerPrefsVariable
 {
-    enum Tipo
+    public enum TipoVariable
     {
-        Boolean=0, Integer=1, Float=2,String=3
+        Boolean=0, Integer=1, Float=2, String=3
     }
 
     public static implicit operator bool(GuazuPlayerPrefsVariable entra)
@@ -35,7 +35,7 @@ public struct GuazuPlayerPrefsVariable
         get
         {
 #if UNITY_EDITOR
-            if (tipo != Tipo.Boolean) Debug.LogError("Boolean no boolean");
+            if (tipo != TipoVariable.Boolean) Debug.LogError("Boolean no boolean");
 #endif
             if (cargar)
             {
@@ -55,7 +55,7 @@ public struct GuazuPlayerPrefsVariable
         get
         {
 #if UNITY_EDITOR
-            if (tipo != Tipo.Integer) Debug.LogError("Integer no integer");
+            if (tipo != TipoVariable.Integer) Debug.LogError("Integer no integer");
 #endif
             if (cargar)
             {
@@ -75,7 +75,7 @@ public struct GuazuPlayerPrefsVariable
         get
         {
 #if UNITY_EDITOR
-            if (tipo != Tipo.Float) Debug.LogError("Float no float");
+            if (tipo != TipoVariable.Float) Debug.LogError("Float no float");
 #endif
             if (cargar)
             {
@@ -95,7 +95,7 @@ public struct GuazuPlayerPrefsVariable
         get
         {
 #if UNITY_EDITOR
-            if (tipo != Tipo.String) Debug.LogError("String no string");
+            if (tipo != TipoVariable.String) Debug.LogError("String no string");
 #endif
             if (cargar)
             {
@@ -111,6 +111,11 @@ public struct GuazuPlayerPrefsVariable
         }
     }
 
+    public TipoVariable Tipo
+    {
+        get { return tipo; }
+    }
+
     [SerializeField]
     string key;
     [SerializeField]
@@ -122,32 +127,32 @@ public struct GuazuPlayerPrefsVariable
     [SerializeField]
     string s;
     [SerializeField]
-    Tipo tipo;
+    TipoVariable tipo;
     bool cargar;
 
-    public GuazuPlayerPrefsVariable(bool b) : this()
+    public GuazuPlayerPrefsVariable(bool b)
     {
         this.b = b;
         cargar = true;
-        tipo = Tipo.Boolean;
+        tipo = TipoVariable.Boolean;
     }
-    public GuazuPlayerPrefsVariable(int i) : this()
+    public GuazuPlayerPrefsVariable(int i)
     {
         this.i = i;
         cargar = true;
-        tipo = Tipo.Integer;
+        tipo = TipoVariable.Integer;
     }
-    public GuazuPlayerPrefsVariable(float f):this()
+    public GuazuPlayerPrefsVariable(float f)
     {
         this.f = f;
         cargar = true;
-        tipo = Tipo.Float;
+        tipo = TipoVariable.Float;
     }
-    public GuazuPlayerPrefsVariable(string s) : this()
+    public GuazuPlayerPrefsVariable(string s)
     {
         this.s = s;
         cargar = true;
-        tipo = Tipo.String;
+        tipo = TipoVariable.String;
     }
 }
 
