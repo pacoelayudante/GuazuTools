@@ -111,6 +111,11 @@ public class GuazuPlayerPrefsVariable
         }
     }
 
+    public void Reset()
+    {
+        PlayerPrefs.DeleteKey(key);
+    }
+
     public TipoVariable Tipo
     {
         get { return tipo; }
