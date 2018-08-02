@@ -30,6 +30,8 @@ public class GuazuPlayerPrefsVariable
         return entra.String;
     }
 
+    public string Key
+    { get { return key; } }
     public bool Bool
     {
         get
@@ -134,6 +136,15 @@ public class GuazuPlayerPrefsVariable
     [SerializeField]
     TipoVariable tipo;
     bool cargar;
+
+    public override string ToString()
+    {
+        if (tipo == TipoVariable.Boolean) return b.ToString();
+        else if (tipo == TipoVariable.Integer) return i.ToString();
+        else if (tipo == TipoVariable.Float) return f.ToString();
+        else if (tipo == TipoVariable.String) return s.ToString();
+        return "ERROR GIGANTE!";
+    }
 
     public GuazuPlayerPrefsVariable(bool b)
     {
