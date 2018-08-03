@@ -41,15 +41,15 @@ public class GuazuPlayerPrefsVariable
 #endif
             if (cargar)
             {
-                b = PlayerPrefs.GetInt(key,b?1:0)==1;
+                bCache = PlayerPrefs.GetInt(key,b?1:0)==1;
                 cargar = false;
             }
-            return b;
+            return bCache;
         }
         set
         {
-            if (string.IsNullOrEmpty(key)) b = value;
-            else PlayerPrefs.SetInt(key, (b = value)?1:0);
+            if (string.IsNullOrEmpty(key)) bCache = value;
+            else PlayerPrefs.SetInt(key, (bCache = value)?1:0);
         }
     }
     public int Int
@@ -61,15 +61,15 @@ public class GuazuPlayerPrefsVariable
 #endif
             if (cargar)
             {
-                i = PlayerPrefs.GetInt(key, i);
+                iCache = PlayerPrefs.GetInt(key, i);
                 cargar = false;
             }
-            return i;
+            return iCache;
         }
         set
         {
-            if (string.IsNullOrEmpty(key)) i = value;
-            else PlayerPrefs.SetInt(key, i = value);
+            if (string.IsNullOrEmpty(key)) iCache = value;
+            else PlayerPrefs.SetInt(key, iCache = value);
         }
     }
     public float Float
@@ -81,15 +81,15 @@ public class GuazuPlayerPrefsVariable
 #endif
             if (cargar)
             {
-                f = PlayerPrefs.GetFloat(key, f);
+                fCache = PlayerPrefs.GetFloat(key, f);
                 cargar = false;
             }
-            return f;
+            return fCache;
         }
         set
         {
-            if (string.IsNullOrEmpty(key)) f = value;
-            else PlayerPrefs.SetFloat(key, f = value);
+            if (string.IsNullOrEmpty(key)) fCache = value;
+            else PlayerPrefs.SetFloat(key, fCache = value);
         }
     }
     public string String
@@ -101,21 +101,26 @@ public class GuazuPlayerPrefsVariable
 #endif
             if (cargar)
             {
-                s = PlayerPrefs.GetString(key, s);
+                sCache = PlayerPrefs.GetString(key, s);
                 cargar = false;
             }
-            return s;
+            return sCache;
         }
         set
         {
-            if (string.IsNullOrEmpty(key)) s = value;
-            else PlayerPrefs.SetString(key, s = value);
+            if (string.IsNullOrEmpty(key)) sCache = value;
+            else PlayerPrefs.SetString(key, sCache = value);
         }
     }
 
     public void Reset()
     {
-        PlayerPrefs.DeleteKey(key);
+        //PlayerPrefs.DeleteKey(key);
+        Bool = b;
+        Int = i;
+        Float = f;
+        String = s;
+        //cargar = true;
     }
 
     public TipoVariable Tipo
@@ -135,15 +140,23 @@ public class GuazuPlayerPrefsVariable
     string s;
     [SerializeField]
     TipoVariable tipo;
-    bool cargar;
-
+    bool cargar=true;
+    bool bCache;
+    int iCache;
+    float fCache;
+    string sCache;
+    
+    public string ToString(string formato)
+    {
+        if (tipo == TipoVariable.Boolean) return Bool.ToString();
+        else if (tipo == TipoVariable.Integer) return Int.ToString(formato);
+        else if (tipo == TipoVariable.Float) return Float.ToString(formato);
+        else if (tipo == TipoVariable.String) return String;
+        return "ERROR GIGANTE!";
+    }
     public override string ToString()
     {
-        if (tipo == TipoVariable.Boolean) return b.ToString();
-        else if (tipo == TipoVariable.Integer) return i.ToString();
-        else if (tipo == TipoVariable.Float) return f.ToString();
-        else if (tipo == TipoVariable.String) return s.ToString();
-        return "ERROR GIGANTE!";
+        return ToString("");
     }
 
     public GuazuPlayerPrefsVariable(bool b)
@@ -196,11 +209,13 @@ public class GuazuPlayerPrefsVariableDrawer : PropertyDrawer
             else if (sfValor.enumValueIndex == 2) sfValor = property.FindPropertyRelative("f");
             else if (sfValor.enumValueIndex == 3) sfValor = property.FindPropertyRelative("s");
         }
-        
-        if(sfValor.propertyType == SerializedPropertyType.Boolean) GUIBool(position, property, label);
+
+       EditorGUI.PropertyField(position,sfValor,label);
+       /* esto es para escribr en las player prefs en realite
+        if (sfValor.propertyType == SerializedPropertyType.Boolean) GUIBool(position, property, label);
         else if (sfValor.propertyType == SerializedPropertyType.Integer) GUIInt(position, property, label);
         else if (sfValor.propertyType == SerializedPropertyType.Float) GUIFloat(position, property, label);
-        else if (sfValor.propertyType == SerializedPropertyType.String) GUIString(position, property, label);
+        else if (sfValor.propertyType == SerializedPropertyType.String) GUIString(position, property, label);*/
     }
 
     void GUIBool(Rect position, SerializedProperty property, GUIContent label)
