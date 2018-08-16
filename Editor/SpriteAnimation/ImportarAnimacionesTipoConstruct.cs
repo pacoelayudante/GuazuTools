@@ -19,6 +19,7 @@ public class ImportarAnimacionesTipoConstruct : EditorWindow {
     static bool AbrirDelContextValidator()
     {
         if (Selection.activeObject == null) return false;
+        if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(Selection.activeObject))) return false;
         return AssetDatabase.GetSubFolders(AssetDatabase.GetAssetPath(Selection.activeObject)).Length > 0;
     }
     public static void ProcesarCarpeta(Object carpetaElegida)
