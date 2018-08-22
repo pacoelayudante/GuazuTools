@@ -134,7 +134,11 @@ public class ClonadorDeAnimators : EditorWindow {
                     string nuevoOrigen = System.IO.Path.Combine(carpetaNuevosSprites, nombreArchivoSprite);
                     s = AssetDatabase.LoadAssetAtPath<Sprite>(nuevoOrigen);
                     if (s) frames[i].value = s;
-                    else framesNoEncontradosAhora++;
+                    else
+                    {
+                        framesNoEncontradosAhora++;
+                        Debug.LogWarning("No se hallo " + nuevoOrigen + "("+(framesNoEncontradosAhora+framesNoEncontradosTotal)+")");
+                    }
                 }
             }
             if (framesNoEncontradosAhora > 0)
@@ -142,9 +146,9 @@ public class ClonadorDeAnimators : EditorWindow {
                 framesNoEncontradosTotal += framesNoEncontradosAhora;
                 conErrores++;
             }
-            EditorUtility.DisplayProgressBar("Guardando Clip", System.IO.Path.Combine(destino, original.name + ".anim"), .1f+((nuevosParesOverrides.Count+1f)/overrides.Count)*.9f);
+            EditorUtility.DisplayProgressBar("Guardando Clip", System.IO.Path.Combine(destino, nuevo.name + ".anim"), .1f+((nuevosParesOverrides.Count+1f)/overrides.Count)*.9f);
             AnimationUtility.SetObjectReferenceCurve(nuevo, bind, frames);
-            AssetDatabase.CreateAsset(nuevo, System.IO.Path.Combine(destino, original.name + ".anim"));
+            AssetDatabase.CreateAsset(nuevo, System.IO.Path.Combine(destino, nuevo.name + ".anim"));
             nuevosParesOverrides.Add(new KeyValuePair<AnimationClip, AnimationClip>(original, nuevo));
         }
         EditorUtility.DisplayProgressBar("Guardando Override", System.IO.Path.Combine(destino, nombreNuevo + ".overrideController"), 1f);
