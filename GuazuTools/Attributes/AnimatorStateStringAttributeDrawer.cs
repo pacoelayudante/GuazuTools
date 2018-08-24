@@ -23,7 +23,7 @@ public class AnimatorStateStringAttributeDrawer : PropertyDrawer
     readonly static GUIContent[] noAnimator = new GUIContent[] { new GUIContent("Animator no hallado o hallado pero sin Animator Controller") };
     //readonly static GUIContent[] noAnimCont = new GUIContent[] { new GUIContent("Animator sin Animator Controller") };
     readonly static GUIContent[] noField = new GUIContent[] { new GUIContent("El campo que se quiere referenciar no se encuentra en este componente") };
-    readonly static GUIContent[] noFieldGameObj = new GUIContent[] { new GUIContent("El campo que se quiere referenciar debe ser un vinculo a un objeto") };
+    //readonly static GUIContent[] noFieldGameObj = new GUIContent[] { new GUIContent("El campo que se quiere referenciar debe ser un vinculo a un objeto") };
     readonly static GUIContent[] noBehav = new GUIContent[] { new GUIContent("No reconocido como behaviour") };
     readonly static GUIContent[] noGameObj = new GUIContent[] { new GUIContent("No asociado a Objeto") };
 

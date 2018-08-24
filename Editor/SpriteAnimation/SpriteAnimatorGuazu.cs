@@ -28,7 +28,7 @@ public class SpriteAnimatorGuazu : EditorWindow
     static readonly string urlIconos = "Assets/GuazuTools/Editor/Editor Default Resources";
     static float escalaVistaPrevia = .25f;
     static bool generarGUISkins = true, estirarPreview = false;
-    static GUIContent texPlay, texPausa, texEliOff, texEliOn, texDupOff, texDupOn;
+    static GUIContent texPlay, /*texPausa,*/ texEliOff, texEliOn, texDupOff, texDupOn;
     static GUIStyle stiloFrameApagado,stiloFrameNormal,stiloFrameElegido,stiloFrameElegidoFusion,
         stiloFrameElegidoPrevio,stiloFrameNormalFusionable,
         stiloBorrarDisabled, stiloBorrarOff, stiloBorrarOn,
@@ -115,7 +115,7 @@ public class SpriteAnimatorGuazu : EditorWindow
     {
         generarGUISkins = false;
         if (texPlay == null) texPlay = new GUIContent(EditorGUIUtility.FindTexture("PlayButton"));
-        if (texPlay == null) texPausa = new GUIContent(EditorGUIUtility.FindTexture("PauseButton"));
+        //if (texPlay == null) texPausa = new GUIContent(EditorGUIUtility.FindTexture("PauseButton"));
         if (texEliOff == null) texEliOff = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos+"/iconotachooff.png"));
         if (texEliOn == null) texEliOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos + "/iconotachoon.png"));
         if (texDupOff == null) texDupOff = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture>(urlIconos + "/iconoduplicaroff.png"));

@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+#pragma warning disable 414
 
 //MODO DE USO v.03
 // >> (opcional) Se elige Animator

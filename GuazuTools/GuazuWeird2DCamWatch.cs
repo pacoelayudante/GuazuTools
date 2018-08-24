@@ -66,7 +66,7 @@ public class GuazuWeird2DCamWatch : MonoBehaviour {
         {
             if (posEnCamara.magnitude < radioCentral * Camara.pixelHeight * .5f / Camara.orthographicSize) UnityEditor.Handles.color = Color.green;
         }
-        UnityEditor.Handles.CircleHandleCap(-1, Vector3.forward, Quaternion.identity, radioCentral, EventType.Repaint);        
+        UnityEditor.Handles.DrawWireDisc(Vector3.forward, Vector3.forward, radioCentral);        
     }
 #endif
 }

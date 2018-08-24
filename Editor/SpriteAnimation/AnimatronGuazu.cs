@@ -1,6 +1,7 @@
 ﻿//actualizacion 1/6/2017
 
 //#define SIN_GUAZU_SPRITE_ANIMATOR
+#pragma warning disable 414
 
 using UnityEngine;
 using UnityEditor;

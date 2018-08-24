@@ -131,7 +131,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
         public override void Dibujar(SceneView sceneView)
         {
             Handles.color = color;
-            Handles.CircleHandleCap(-1, posicion, Quaternion.identity,radio, EventType.Repaint);
+            Handles.DrawWireDisc(posicion, Vector3.forward,radio);
         }
     }
 
@@ -184,7 +184,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
         public override void Dibujar(SceneView sceneView)
         {
             Handles.color = color;
-            Handles.ArrowHandleCap(-1, posicion, Quaternion.LookRotation(direccion), HandleUtility.GetHandleSize(posicion) * .3f,EventType.Repaint);            
+            DrawArrow( posicion, Quaternion.LookRotation(direccion), HandleUtility.GetHandleSize(posicion) * .3f, Vector3.zero);            
         }
     }
 
@@ -204,6 +204,73 @@ public class GuazuGizmoSpawner : MonoBehaviour
             Handles.color = color;
             Handles.DrawLine(puntoA,puntoB);
         }
+    }
+
+    static Mesh Cono
+    {
+        get
+        {
+            if (!cono)
+            {
+                CargarMallasBasicas();
+            }
+            return cono;
+        }
+    }
+    static void CargarMallasBasicas()
+    {
+        GameObject handleGo = (GameObject)EditorGUIUtility.Load("SceneView/HandlesGO.fbx");
+        if (!handleGo)
+        {
+            Debug.Log("Couldn't find SceneView/HandlesGO.fbx");
+        }
+        handleGo.SetActive(false);
+        const string k_AssertMessage = "mesh is null. A problem has occurred with `SceneView/HandlesGO.fbx`";
+        foreach (Transform t in handleGo.transform)
+        {
+            var meshFilter = t.GetComponent<MeshFilter>();
+            switch (t.name)
+            {
+                /*case "Cube":
+                    s_CubeMesh = meshFilter.sharedMesh;
+                    Debug.AssertFormat(s_CubeMesh != null, k_AssertMessage);
+                    break;
+                case "Sphere":
+                    s_SphereMesh = meshFilter.sharedMesh;
+                    Debug.AssertFormat(s_SphereMesh != null, k_AssertMessage);
+                    break;*/
+                case "Cone":
+                    cono = meshFilter.sharedMesh;
+                    Debug.AssertFormat(cono != null, k_AssertMessage);
+                    break;
+                    /* case "Cylinder":
+                         s_CylinderMesh = meshFilter.sharedMesh;
+                         Debug.AssertFormat(s_CylinderMesh != null, k_AssertMessage);
+                         break;
+                     case "Quad":
+                         s_QuadMesh = meshFilter.sharedMesh;
+                         Debug.AssertFormat(s_QuadMesh != null, k_AssertMessage);
+                         break;*/
+            }
+        }
+    }
+    static Mesh cono;
+
+    static void DrawArrow(Vector3 position, Quaternion rotation, float size, Vector3 coneOffset)
+    {
+        Vector3 direction = rotation * Vector3.forward;
+        Handles.DrawLine(position, position + (direction + coneOffset) * size * .9f);
+        Graphics.DrawMeshNow(Cono, StartCapDraw(position + (direction + coneOffset) * size, Quaternion.LookRotation(direction), size * .2f));
+    }
+    static Matrix4x4 StartCapDraw(Vector3 position, Quaternion rotation, float size)
+    {
+        Shader.SetGlobalColor("_HandleColor", Handles.color);
+        Shader.SetGlobalFloat("_HandleSize", size);
+        Matrix4x4 mat = Handles.matrix * Matrix4x4.TRS(position, rotation, Vector3.one);
+        Shader.SetGlobalMatrix("_ObjectToWorld", mat);
+        HandleUtility.handleMaterial.SetInt("_HandleZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
+        HandleUtility.handleMaterial.SetPass(0);
+        return mat;
     }
 #endif
 }
