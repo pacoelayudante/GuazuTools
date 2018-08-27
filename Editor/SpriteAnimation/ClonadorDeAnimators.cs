@@ -98,6 +98,11 @@ public class ClonadorDeAnimators : EditorWindow {
             GenerarClon(destino);
             }
         }
+        GUI.enabled=clips.Length>0 && !string.IsNullOrEmpty(carpetaNuevosSprites) && posiblesSpritesNuevos.Length > 0;
+        if(GUILayout.Button("Copiar Configuracion de Importacion"))
+        {
+            CopiarConfiguracion();
+        }
     }
 
     void GenerarClon(string destino)
@@ -126,7 +131,7 @@ public class ClonadorDeAnimators : EditorWindow {
             int framesNoEncontradosAhora = 0;
             for (int i = 0; i < frames.Length; i++)
             {
-                EditorUtility.DisplayProgressBar("Reemplazando Sprites", "buscando sprite numero "+i+" en clip numero "+nuevosParesOverrides.Count, .1f+.9f*Mathf.InverseLerp((nuevosParesOverrides.Count / (float)overrides.Count), (nuevosParesOverrides.Count+1 / overrides.Count),i/(float)frames.Length));
+                EditorUtility.DisplayProgressBar("Reemplazando Sprites", "buscando sprite numero "+i+" en clip numero "+nuevosParesOverrides.Count, .1f+.9f*Mathf.Lerp((nuevosParesOverrides.Count / (float)overrides.Count), (nuevosParesOverrides.Count+1f) / overrides.Count,i/(float)frames.Length));
                 Sprite s = frames[i].value as Sprite;
                 if (s)
                 {
@@ -155,6 +160,66 @@ public class ClonadorDeAnimators : EditorWindow {
         nuevoOverride.ApplyOverrides(nuevosParesOverrides);
         AssetDatabase.CreateAsset(nuevoOverride, System.IO.Path.Combine(destino, nombreNuevo + ".overrideController"));
         AssetDatabase.SaveAssets();
+        EditorUtility.ClearProgressBar();
+        if (conErrores > 0)
+        {
+            Debug.LogWarning("No se hallaron " + framesNoEncontradosTotal + " sprites afectando a " + conErrores + " clips");
+            EditorUtility.DisplayDialog("Surgio un tema", "No se hallaron " + framesNoEncontradosTotal + " sprites afectando a " + conErrores + " clips", "Que macana");
+        }
+    }
+
+    void CopiarConfiguracion()
+    {
+        EditorUtility.DisplayProgressBar("Cargando Modelo", "Leyendo paths, cargando el modelo (" + Modelo.name + ")", .05f);
+        RuntimeAnimatorController modeloOriginal = modeloComoOverride ? modeloComoOverride.runtimeAnimatorController : modeloComoController;
+        EditorCurveBinding bind = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
+        int clipscontados=0;
+        int clipstotal = modeloOriginal.animationClips.Length;
+        int framesNoEncontradosTotal = 0;
+        int conErrores = 0;
+        foreach (var clip in modeloOriginal.animationClips)
+        {
+            EditorUtility.DisplayProgressBar("Cargando Cada Animation Clip", "Cargando clip numero " + clipscontados + " de " + clipstotal, .1f + (clipscontados / (float)clipstotal) * .9f);
+
+            var frames = AnimationUtility.GetObjectReferenceCurve(clip, bind);
+            int framesNoEncontradosAhora = 0;
+            for (int i = 0; i < frames.Length; i++)
+            {
+                EditorUtility.DisplayProgressBar("Modificando Sprites", "buscando sprite numero " + i + " en clip numero " + clipscontados, .1f + .9f * Mathf.Lerp((clipscontados / (float)clipstotal), (clipscontados + 1f) / clipstotal, i / (float)frames.Length));
+                Sprite s = frames[i].value as Sprite;
+                string pathSprite = s ? AssetDatabase.GetAssetPath(s) : null;
+                    TextureImporter tImporter = pathSprite!=null? AssetImporter.GetAtPath(pathSprite)as TextureImporter:null;
+                if (tImporter)
+                {
+                    TextureImporterSettings tiSettings=new TextureImporterSettings();
+                    tImporter.ReadTextureSettings(tiSettings);
+                    string nuevoPath = System.IO.Path.Combine(carpetaNuevosSprites, System.IO.Path.GetFileName(pathSprite));
+                    tImporter = AssetImporter.GetAtPath(nuevoPath) as TextureImporter;
+                    if (tImporter)
+                    {
+                        tImporter.SetTextureSettings(tiSettings);
+                        tImporter.SaveAndReimport();
+                    }
+                    else
+                    {
+                        framesNoEncontradosAhora++;
+                        Debug.LogWarning("No se hallo " + nuevoPath + "de los destino (" + (framesNoEncontradosAhora + framesNoEncontradosTotal) + ")");
+                    }
+                }
+                else
+                {
+                    framesNoEncontradosAhora++;
+                    Debug.LogWarning("No se hallo " + s + "de los de origen (" + (framesNoEncontradosAhora + framesNoEncontradosTotal) + ")");
+                }
+            }
+            if (framesNoEncontradosAhora > 0)
+            {
+                framesNoEncontradosTotal += framesNoEncontradosAhora;
+                conErrores++;
+            }
+            clipscontados++;
+        }
+
         EditorUtility.ClearProgressBar();
         if (conErrores > 0)
         {
