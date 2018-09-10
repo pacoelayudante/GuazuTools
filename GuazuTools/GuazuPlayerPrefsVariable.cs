@@ -129,7 +129,7 @@ public class GuazuPlayerPrefsVariable
     }
 
     [SerializeField]
-    string key;
+    string key="";
     [SerializeField]
     float f;
     [SerializeField]
@@ -137,7 +137,7 @@ public class GuazuPlayerPrefsVariable
     [SerializeField]
     bool b;
     [SerializeField]
-    string s;
+    string s="";
     [SerializeField]
     TipoVariable tipo;
     bool cargar=true;

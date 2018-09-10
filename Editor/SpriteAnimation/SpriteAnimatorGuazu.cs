@@ -25,7 +25,7 @@ public class SpriteAnimatorGuazu : EditorWindow
         textoInterrumpir = "Hacela mierda nomas",
         textoNoInterrumpir = "[WIP] ¡Uy, espera! [WIP]";
 
-    static readonly string urlIconos = "Assets/GuazuTools/Editor/Editor Default Resources";
+    static readonly string urlIconos = "Assets/GuazuTools/Editor/Editor Default Resources/GuazuTools";
     static float escalaVistaPrevia = .25f;
     static bool generarGUISkins = true, estirarPreview = false;
     static GUIContent texPlay, /*texPausa,*/ texEliOff, texEliOn, texDupOff, texDupOn;
