@@ -69,4 +69,10 @@ public static class Guazu {
         destino.triangles = t;
         return destino;
     }
+
+    public static IEnumerator EsperarFalseYEntonces(System.Func<bool> esperarFalse, System.Action yEntonces)
+    {
+        while (esperarFalse()) yield return null;
+        yEntonces();
+    }
 }
