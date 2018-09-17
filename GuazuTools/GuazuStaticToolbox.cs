@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class Guazu {
-
-    public static Vector3 MirrorVector
-    {
-        get { return new Vector3(-1, 1, 1); }
-    }
+    
+    public static readonly Vector3 MirrorVector = new Vector3(-1f, 1f, 1f);
+    public static readonly Vector3 FlipVector = new Vector3(1f, -1f, 1f);
 
     public static Quaternion QuaternionRandom2D{
         get{
