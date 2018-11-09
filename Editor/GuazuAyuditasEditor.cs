@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class GuazuAyuditasEditor : EditorWindow {    
+public static class GuazuAyuditasEditor {    
     [MenuItem("CONTEXT/PolygonCollider2D/Espejar")]
     public static void EspejarPolyColl2D(MenuCommand command)
     {
