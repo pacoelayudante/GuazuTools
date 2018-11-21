@@ -101,7 +101,6 @@ public class GuazuDependenciasExplorer : EditorWindow{
 
     private void OnEnable()
     {
-        EditorUtility.ClearProgressBar();
         dependientesVisibles = new AnimBool(Repaint);
     }
     private void OnDisable()
