@@ -37,6 +37,7 @@ public class GuazuDependenciasExplorer : EditorWindow{
     public static List<Object> BuscarDependientes(Object objetoInteres)
     {
         var resultado = new List<Object>();
+        var pathDeInteres = AssetDatabase.GetAssetPath(objetoInteres);
         if(EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias", "Esto puede tardar un rato...", 0f))
         {
             EditorUtility.ClearProgressBar();
@@ -58,14 +59,18 @@ public class GuazuDependenciasExplorer : EditorWindow{
                 EditorUtility.ClearProgressBar();
                 return null;
             }
-            var coleccion = EditorUtility.CollectDependencies(new Object[] { objEscena });
-            if (System.Array.Exists(coleccion, cadaUno => cadaUno.Equals(objetoInteres)))
+            //var coleccion = EditorUtility.CollectDependencies(new Object[] { objEscena });
+            var coleccion = AssetDatabase.GetDependencies(escenas[i].path);
+            //if (System.Array.Exists(coleccion, cadaUno => cadaUno.Equals(objetoInteres)))
+            if (System.Array.Exists(coleccion, cadaUno => cadaUno.Equals(pathDeInteres)))
             {
                 resultado.Add(objEscena);
-                //y ahora buscar en los objetos que son onda, prefabsss
+                //y ahora buscar en los objetos que son onda, prefabsss o animator o animationclip
                 float miniProgreso = 0f;
-                foreach(Object prefabEnEscena in coleccion)
+                //foreach(Object prefabEnEscena in coleccion)
+                foreach(string pathDePrefabEnEscena in coleccion)
                 {
+                    var prefabEnEscena = AssetDatabase.LoadMainAssetAtPath(pathDePrefabEnEscena);
                     miniProgreso += .5f / (coleccion.Length* escenas.Length);
                     if ((prefabEnEscena as GameObject) == null && (prefabEnEscena as RuntimeAnimatorController) == null && (prefabEnEscena as AnimationClip) == null) continue;
                     if (resultado.Contains(prefabEnEscena)) continue;
@@ -76,8 +81,10 @@ public class GuazuDependenciasExplorer : EditorWindow{
                             EditorUtility.ClearProgressBar();
                             return null;
                         }
-                        var prefabDepends = EditorUtility.CollectDependencies(new Object[] { prefabEnEscena });
-                        if (System.Array.Exists(prefabDepends, cadaUno => cadaUno.Equals(objetoInteres))) resultado.Add(prefabEnEscena);
+                        //var prefabDepends = EditorUtility.CollectDependencies(new Object[] { prefabEnEscena });
+                        //if (System.Array.Exists(prefabDepends, cadaUno => cadaUno.Equals(objetoInteres))) resultado.Add(prefabEnEscena);
+                        var prefabDependsPath = AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(prefabEnEscena));
+                        if (System.Array.Exists(prefabDependsPath, cadaUno => cadaUno.Equals(pathDeInteres))) resultado.Add(prefabEnEscena);
                     }
                 }
             }
