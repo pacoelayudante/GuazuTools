@@ -15,7 +15,8 @@ public static class Guazu {
 
     public static Quaternion QuaternionEuler(Vector2 vec2)
     {
-        return Quaternion.Euler( 0, 0, Mathf.Atan2( vec2.y, vec2.x )*Mathf.Rad2Deg );
+        if (vec2.x==vec2.y) return Quaternion.identity;
+        else return Quaternion.Euler( 0, 0, Mathf.Atan2( vec2.y, vec2.x )*Mathf.Rad2Deg );
     }
 
     public static Quaternion MirrorQuaternion(Quaternion q)
