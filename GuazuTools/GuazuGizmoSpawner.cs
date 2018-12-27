@@ -11,7 +11,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
     [InitializeOnLoadMethod]
     static void LoadEstadoActivo()
     {
-        activo = EditorPrefs.GetBool("GuazuGizmoSpawner.Activo",true);
+        activo = EditorPrefs.GetBool("GuazuGizmoSpawner.Activo",activo);
     }
 
     [MenuItem("Guazu/Gizmos Guazu Visibles")]
@@ -31,7 +31,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
         get { return activo; }
         set { EditorPrefs.SetBool("GuazuGizmoSpawner.Activo", activo = value); }
     }
-    static bool activo=true;
+    static bool activo=false;
 #endif
 
     public static void DibujarTexto(string texto, Vector3 posicion, Color color, float duracion = -1)
@@ -178,7 +178,7 @@ public class GuazuGizmoSpawner : MonoBehaviour
         public Flecha(Vector3 posicion, Vector3 direccion, Color color)
         {
             this.posicion = posicion;
-            this.direccion = direccion;
+            this.direccion = direccion==Vector3.zero?Vector3.right: direccion;
             this.color = color;
         }
         public override void Dibujar(SceneView sceneView)
