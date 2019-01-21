@@ -31,7 +31,7 @@ public class GuazuPlayerPrefsVariable
     }
 
     public string Key
-    { get { return key; } }
+    { get { return key==null?string.Empty:key; } }
     public bool Bool
     {
         get
