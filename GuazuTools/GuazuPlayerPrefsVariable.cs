@@ -10,7 +10,7 @@ public class GuazuPlayerPrefsVariable
 {
     public enum TipoVariable
     {
-        Boolean=0, Integer=1, Float=2, String=3
+        Boolean = 0, Integer = 1, Float = 2, String = 3
     }
 
     public static implicit operator bool(GuazuPlayerPrefsVariable entra)
@@ -41,7 +41,7 @@ public class GuazuPlayerPrefsVariable
 #endif
             if (cargar)
             {
-                bCache = PlayerPrefs.GetInt(key,b?1:0)==1;
+                bCache = PlayerPrefs.GetInt(key, b ? 1 : 0) == 1;
                 cargar = false;
             }
             return bCache;
@@ -49,7 +49,7 @@ public class GuazuPlayerPrefsVariable
         set
         {
             if (string.IsNullOrEmpty(key)) bCache = value;
-            else PlayerPrefs.SetInt(key, (bCache = value)?1:0);
+            else PlayerPrefs.SetInt(key, (bCache = value) ? 1 : 0);
         }
     }
     public int Int
@@ -129,7 +129,7 @@ public class GuazuPlayerPrefsVariable
     }
 
     [SerializeField]
-    string key="";
+    string key = "";
     [SerializeField]
     float f;
     [SerializeField]
@@ -137,15 +137,15 @@ public class GuazuPlayerPrefsVariable
     [SerializeField]
     bool b;
     [SerializeField]
-    string s="";
+    string s = "";
     [SerializeField]
     TipoVariable tipo;
-    bool cargar=true;
+    bool cargar = true;
     bool bCache;
     int iCache;
     float fCache;
     string sCache;
-    
+
     public string ToString(string formato)
     {
         if (tipo == TipoVariable.Boolean) return Bool.ToString();
@@ -189,8 +189,9 @@ public class GuazuPlayerPrefsVariable
 [CustomPropertyDrawer(typeof(GuazuPlayerPrefsVariable))]
 public class GuazuPlayerPrefsVariableDrawer : PropertyDrawer
 {
-    SerializedProperty sfKey,sfValor;
+    SerializedProperty sfKey, sfValor;
     string key;
+    bool editandoDefault = false;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
@@ -210,48 +211,84 @@ public class GuazuPlayerPrefsVariableDrawer : PropertyDrawer
             else if (sfValor.enumValueIndex == 3) sfValor = property.FindPropertyRelative("s");
         }
 
-       EditorGUI.PropertyField(position,sfValor,label);
-       /* esto es para escribr en las player prefs en realite
-        if (sfValor.propertyType == SerializedPropertyType.Boolean) GUIBool(position, property, label);
+        var ancho = (position.width-EditorGUIUtility.labelWidth)/3f;
+        position.width = EditorGUIUtility.labelWidth;
+        GUI.Label(position, label);
+        label = GUIContent.none;
+        position.x += position.width;
+        position.width = ancho;
+        GUI.enabled = !editandoDefault;
+        // esto es para escribr en las player prefs en realite
+        if(!PlayerPrefs.HasKey(key)) {
+            GUI.enabled = false;
+            GUI.Label(position,"Sin valor de usuario");
+        }
+        else if (sfValor.propertyType == SerializedPropertyType.Boolean) GUIBool(position, property, label);
         else if (sfValor.propertyType == SerializedPropertyType.Integer) GUIInt(position, property, label);
         else if (sfValor.propertyType == SerializedPropertyType.Float) GUIFloat(position, property, label);
-        else if (sfValor.propertyType == SerializedPropertyType.String) GUIString(position, property, label);*/
+        else if (sfValor.propertyType == SerializedPropertyType.String) GUIString(position, property, label);
+        //y estp escribe el valor default
+        position.x += position.width;
+        position.width /= 2f;
+        GUI.enabled = true;
+        if (GUI.Toggle(position, !editandoDefault, "Usuario", "Button"))
+        {
+            editandoDefault = false;
+        }
+        position.x += position.width;
+        if (GUI.Toggle(position, editandoDefault, "Default", "Button"))
+        {
+            editandoDefault = true;
+        }
+        position.x += position.width;
+        position.width *= 2f;
+        GUI.enabled = editandoDefault;
+        EditorGUI.PropertyField(position, sfValor, label);
+        GUI.enabled = true;
     }
 
     void GUIBool(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginChangeCheck();
-        sfValor.boolValue = EditorGUI.Toggle(position, label, PlayerPrefs.GetInt(key, sfValor.boolValue?1:0)==1);
+        // sfValor.boolValue = EditorGUI.Toggle(position, label, PlayerPrefs.GetInt(key, sfValor.boolValue?1:0)==1);
+        var boolValue = EditorGUI.Toggle(position, label, PlayerPrefs.GetInt(key, sfValor.boolValue ? 1 : 0) == 1);
         if (EditorGUI.EndChangeCheck())
         {
-            PlayerPrefs.SetInt(key, sfValor.boolValue? 1:0);
+            // PlayerPrefs.SetInt(key, sfValor.boolValue? 1:0);
+            PlayerPrefs.SetInt(key, boolValue ? 1 : 0);
         }
     }
     void GUIInt(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginChangeCheck();
-        sfValor.intValue = EditorGUI.IntField(position, label, PlayerPrefs.GetInt(key, sfValor.intValue));
+        // sfValor.intValue = EditorGUI.IntField(position, label, PlayerPrefs.GetInt(key, sfValor.intValue));
+        var intValue = EditorGUI.IntField(position, label, PlayerPrefs.GetInt(key, sfValor.intValue));
         if (EditorGUI.EndChangeCheck())
         {
-            PlayerPrefs.SetInt(key, sfValor.intValue);
+            // PlayerPrefs.SetInt(key, sfValor.intValue);
+            PlayerPrefs.SetInt(key, intValue);
         }
     }
     void GUIFloat(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginChangeCheck();
-        sfValor.floatValue = EditorGUI.FloatField(position, label, PlayerPrefs.GetFloat(key, sfValor.floatValue));
+        // sfValor.floatValue = EditorGUI.FloatField(position, label, PlayerPrefs.GetFloat(key, sfValor.floatValue));
+        var floatValue = EditorGUI.FloatField(position, label, PlayerPrefs.GetFloat(key, sfValor.floatValue));
         if (EditorGUI.EndChangeCheck())
         {
-            PlayerPrefs.SetFloat(key, sfValor.floatValue);
+            // PlayerPrefs.SetFloat(key, sfValor.floatValue);
+            PlayerPrefs.SetFloat(key, floatValue);
         }
     }
     void GUIString(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginChangeCheck();
-        sfValor.stringValue = EditorGUI.TextField(position, label, PlayerPrefs.GetString(key, sfValor.stringValue));
+        // sfValor.stringValue = EditorGUI.TextField(position, label, PlayerPrefs.GetString(key, sfValor.stringValue));
+        var stringValue = EditorGUI.TextField(position, label, PlayerPrefs.GetString(key, sfValor.stringValue));
         if (EditorGUI.EndChangeCheck())
         {
-            PlayerPrefs.SetString(key, sfValor.stringValue);
+            // PlayerPrefs.SetString(key, sfValor.stringValue);
+            PlayerPrefs.SetString(key, stringValue);
         }
     }
 }
