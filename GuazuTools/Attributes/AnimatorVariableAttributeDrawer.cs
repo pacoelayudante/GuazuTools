@@ -38,7 +38,10 @@ public class AnimatorVariableAttributeDrawer : PropertyDrawer
             {
                 if (att.buscarEnChildren) animator = beh.GetComponentInChildren<Animator>();
             }
-            if (animator) return animator.runtimeAnimatorController as an.AnimatorController;
+            if (animator) {
+                if(animator.runtimeAnimatorController is AnimatorOverrideController) return (animator.runtimeAnimatorController as AnimatorOverrideController).runtimeAnimatorController as an.AnimatorController;
+                else return animator.runtimeAnimatorController as an.AnimatorController;
+            }
             return null;
         }
         else
@@ -55,6 +58,7 @@ public class AnimatorVariableAttributeDrawer : PropertyDrawer
                 if (!elOtro) return null;
                 an.AnimatorController esController = elOtro as an.AnimatorController;
                 if (esController) return esController;
+                else if (elOtro is AnimatorOverrideController) return (elOtro as AnimatorOverrideController).runtimeAnimatorController as an.AnimatorController;
                 Animator esAnimator = elOtro as Animator;
                 if (!esAnimator)
                 {
@@ -66,7 +70,10 @@ public class AnimatorVariableAttributeDrawer : PropertyDrawer
                         if (esComponent) esAnimator = esComponent.GetComponent<Animator>();
                     }
                 }
-                if (esAnimator) return esAnimator.runtimeAnimatorController as an.AnimatorController;
+                if (esAnimator) {
+                    if(esAnimator.runtimeAnimatorController is AnimatorOverrideController) return (esAnimator.runtimeAnimatorController as AnimatorOverrideController).runtimeAnimatorController as an.AnimatorController;
+                    else return esAnimator.runtimeAnimatorController as an.AnimatorController;
+                }
                 else return null;
             }
             else
