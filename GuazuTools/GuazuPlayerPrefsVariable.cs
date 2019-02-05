@@ -159,29 +159,33 @@ public class GuazuPlayerPrefsVariable
         return ToString("");
     }
 
-    public GuazuPlayerPrefsVariable(bool b)
+    public GuazuPlayerPrefsVariable(bool b, string key=null)
     {
         this.b = b;
         cargar = true;
         tipo = TipoVariable.Boolean;
+        if(!string.IsNullOrEmpty(key))this.key=key;
     }
-    public GuazuPlayerPrefsVariable(int i)
+    public GuazuPlayerPrefsVariable(int i, string key=null)
     {
         this.i = i;
         cargar = true;
         tipo = TipoVariable.Integer;
+        if(!string.IsNullOrEmpty(key))this.key=key;
     }
-    public GuazuPlayerPrefsVariable(float f)
+    public GuazuPlayerPrefsVariable(float f, string key=null)
     {
         this.f = f;
         cargar = true;
         tipo = TipoVariable.Float;
+        if(!string.IsNullOrEmpty(key))this.key=key;
     }
-    public GuazuPlayerPrefsVariable(string s)
+    public GuazuPlayerPrefsVariable(string s, string key=null)
     {
         this.s = s;
         cargar = true;
         tipo = TipoVariable.String;
+        if(!string.IsNullOrEmpty(key))this.key=key;
     }
 }
 
