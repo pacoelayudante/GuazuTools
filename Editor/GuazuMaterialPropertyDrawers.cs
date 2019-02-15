@@ -3,6 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+public class MaskFlagsDrawer : MaterialPropertyDrawer{
+    public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor){
+        EditorGUIUtility.labelWidth = 1;
+        var rect = EditorGUI.PrefixLabel(position,label);
+        EditorGUIUtility.labelWidth = 0f;
+        rect.width /= 8f;
+        for(int i=8; i>=0;i++){
+            EditorGUI.Toggle(rect,(1<<i).ToString(),false);
+            rect.x+=rect.width;
+        }
+    }
+}
+
 public class ToggleZeroMaterialDrawer : MaterialPropertyDrawer
 {
     protected readonly string keyword;
