@@ -3,15 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class MaskFlagsDrawer : MaterialPropertyDrawer{
-    public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor){
-        EditorGUIUtility.labelWidth = 1;
-        var rect = EditorGUI.PrefixLabel(position,label);
-        EditorGUIUtility.labelWidth = 0f;
-        rect.width /= 8f;
-        for(int i=8; i>=0;i++){
-            EditorGUI.Toggle(rect,(1<<i).ToString(),false);
-            rect.x+=rect.width;
+public class MaskFlagsDrawer : MaterialPropertyDrawer
+{
+    public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+    {
+        EditorGUIUtility.labelWidth = position.width / 3f;
+        if (prop.type != MaterialProperty.PropType.Float)
+        {
+            editor.DefaultShaderProperty(prop, label.text);
+            return;
+        }
+        label.text += " = " + prop.floatValue.ToString();
+        int mascara = Mathf.FloorToInt(prop.floatValue) & (255);
+        var rect = EditorGUI.PrefixLabel(position, label);
+        rect.x += rect.width;
+        rect.width = rect.height;
+        for (int i = 0; i < 8; i++)
+        {
+            rect.x -= rect.width;
+            EditorGUI.BeginChangeCheck();
+            var on = EditorGUI.Toggle(rect, ((1 << i) & mascara) > 0);
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (on) mascara |= 1 << i;
+                else mascara &= ~(1 << i);
+                prop.floatValue = mascara;
+            }
         }
     }
 }
