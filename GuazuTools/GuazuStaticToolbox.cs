@@ -126,4 +126,10 @@ public static class Guazu {
         while (esperarFalse()) yield return null;
         yEntonces();
     }
+    public static IEnumerator DelayYEntonces(float t, System.Action yEntonces, bool unscaled = false)
+    {
+        if(unscaled)yield return new WaitForSecondsRealtime(t);
+        else yield return new WaitForSeconds(t);
+        yEntonces();
+    }
 }
