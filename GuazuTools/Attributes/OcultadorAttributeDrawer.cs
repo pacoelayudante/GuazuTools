@@ -88,7 +88,7 @@ public class OcultadorAttributeDrawer : PropertyDrawer
         }
         else visibilidad.target=ocultador.Comp(propControl);
         
-        if(visibilidad.target)EditorGUI.PropertyField(position, property, label);
+        if(visibilidad.target)EditorGUI.PropertyField(position, property);
     }
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
