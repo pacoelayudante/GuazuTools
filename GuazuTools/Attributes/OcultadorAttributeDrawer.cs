@@ -26,6 +26,7 @@ public class OcultadorAttribute : PropertyAttribute
         if (prop.propertyType == SerializedPropertyType.Boolean) return prop.boolValue ^ xorInverter;
         else if (prop.propertyType == SerializedPropertyType.Integer) return Comp(prop.intValue) ^ xorInverter;
         else if (prop.propertyType == SerializedPropertyType.Float) return Comp(prop.floatValue) ^ xorInverter;
+        else if (prop.propertyType == SerializedPropertyType.String) return Comp(prop.stringValue) ^ xorInverter;
         else if (prop.propertyType == SerializedPropertyType.ObjectReference) return (prop.objectReferenceValue!=null) ^ xorInverter;
         return true;//El default es true porqu si  todo  falla queremos que la  cosa  sea visible
     }
@@ -38,6 +39,10 @@ public class OcultadorAttribute : PropertyAttribute
     {
         if (valor >= floatMin) return valor <= floatMax;
         else return false;
+    }
+    bool Comp(string valor)
+    {
+        return !string.IsNullOrEmpty(valor);
     }
 #endif
     public OcultadorAttribute(string nombreData, bool negarValorBool = false)
