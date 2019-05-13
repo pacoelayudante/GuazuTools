@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEditor.AnimatedValues;
 using UnityEditor;
 
-public class GuazuDependenciasExplorer : EditorWindow{
+public class GuazuDependenciasExplorer : EditorWindow
+{
     Object ObjetoDeMiInteres
     {
         get { return objetoInteres; }
@@ -18,7 +19,8 @@ public class GuazuDependenciasExplorer : EditorWindow{
                     dependientesVisibles.target = false;
                     detalleDeDependientes = null;
                 }
-                else {
+                else
+                {
                     detalleDeDependientes = BuscarDependientes(objetoInteres);
                     if (detalleDeDependientes == null)
                     {
@@ -38,7 +40,7 @@ public class GuazuDependenciasExplorer : EditorWindow{
     {
         var resultado = new List<Object>();
         var pathDeInteres = AssetDatabase.GetAssetPath(objetoInteres);
-        if(EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias", "Esto puede tardar un rato...", 0f))
+        if (EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias", "Esto puede tardar un rato...", 0f))
         {
             EditorUtility.ClearProgressBar();
             return null;
@@ -46,7 +48,7 @@ public class GuazuDependenciasExplorer : EditorWindow{
         var escenas = EditorBuildSettings.scenes;
         for (int i = 0; i < escenas.Length; i++)
         {
-            float progreso = (i+.25f)/escenas.Length;
+            float progreso = (i + .25f) / escenas.Length;
             if (EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias (" + resultado.Count + ")", "Cargando " + escenas[i].path, progreso))
             {
                 EditorUtility.ClearProgressBar();
@@ -54,7 +56,7 @@ public class GuazuDependenciasExplorer : EditorWindow{
             }
             var objEscena = AssetDatabase.LoadMainAssetAtPath(escenas[i].path);
             progreso = (i + .5f) / escenas.Length;
-            if (EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias ("+resultado.Count+")", "Colectando dependencias de " + escenas[i].path, progreso))
+            if (EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias (" + resultado.Count + ")", "Colectando dependencias de " + escenas[i].path, progreso))
             {
                 EditorUtility.ClearProgressBar();
                 return null;
@@ -68,15 +70,15 @@ public class GuazuDependenciasExplorer : EditorWindow{
                 //y ahora buscar en los objetos que son onda, prefabsss o animator o animationclip
                 float miniProgreso = 0f;
                 //foreach(Object prefabEnEscena in coleccion)
-                foreach(string pathDePrefabEnEscena in coleccion)
+                foreach (string pathDePrefabEnEscena in coleccion)
                 {
                     var prefabEnEscena = AssetDatabase.LoadMainAssetAtPath(pathDePrefabEnEscena);
-                    miniProgreso += .5f / (coleccion.Length* escenas.Length);
+                    miniProgreso += .5f / (coleccion.Length * escenas.Length);
                     if ((prefabEnEscena as GameObject) == null && (prefabEnEscena as RuntimeAnimatorController) == null && (prefabEnEscena as AnimationClip) == null) continue;
                     if (resultado.Contains(prefabEnEscena)) continue;
                     if (prefabEnEscena)
                     {
-                        if (EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias (" + resultado.Count + ")", "Colectando dependencias de "+prefabEnEscena+ "que esta en " + escenas[i].path, progreso+ miniProgreso))
+                        if (EditorUtility.DisplayCancelableProgressBar("Recolectando dependencias (" + resultado.Count + ")", "Colectando dependencias de " + prefabEnEscena + "que esta en " + escenas[i].path, progreso + miniProgreso))
                         {
                             EditorUtility.ClearProgressBar();
                             return null;
@@ -95,7 +97,38 @@ public class GuazuDependenciasExplorer : EditorWindow{
 
     Object objetoInteres;
     AnimBool dependientesVisibles;
+    List<Object> Dependibles
+    {
+        get
+        {
+            return dependibles;
+        }
+        set
+        {
+            if (value != null)
+            {
+                borrables = null;
+                dependibles = value;
+            }
+        }
+    }
+    List<Object> Borrables
+    {
+        get
+        {
+            return borrables;
+        }
+        set
+        {
+            if (value != null)
+            {
+                dependibles = null;
+                borrables = value;
+            }
+        }
+    }
     List<Object> dependibles = new List<Object>();
+    List<Object> borrables = null;
     List<Object> detalleDeDependientes = null;
     Vector2 scroll;
 
@@ -112,14 +145,63 @@ public class GuazuDependenciasExplorer : EditorWindow{
     {
         var dependibles = new List<Object>();
         foreach (var path in pathsDependibles) dependibles.Add(AssetDatabase.LoadMainAssetAtPath(path));
-        GetWindow<GuazuDependenciasExplorer>().dependibles = dependibles;
+        GetWindow<GuazuDependenciasExplorer>().Dependibles = dependibles;
+    }
+    public static void MostrarBorrables(List<string> pathsBorrables)
+    {
+        var borrables = new List<Object>();
+        foreach (var path in pathsBorrables) borrables.Add(AssetDatabase.LoadMainAssetAtPath(path));
+        GetWindow<GuazuDependenciasExplorer>().Borrables = borrables;
     }
 
     private void OnGUI()
     {
-        scroll=EditorGUILayout.BeginScrollView(scroll);
+        if (Dependibles != null)
+        {
+            OnGUIDependibles();
+        }
+        if (Borrables != null)
+        {
+            OnGUIBorrables();
+        }
+    }
+
+    void OnGUIBorrables()
+    {
+        scroll = EditorGUILayout.BeginScrollView(scroll);
+        if (GUILayout.Button("Seleccionar Todos"))
+        {
+            Selection.objects = Borrables.ToArray();
+        }
+        if (GUILayout.Button("Borrar Todos"))
+        {
+            if (EditorUtility.DisplayDialog("Borrar", "Borrar " + Borrables.Count + " elementos", "Kaboom!", "Nope!"))
+            {
+                var ftot = 0f;
+                var fsum = 1f / Borrables.Count;
+                foreach (var dep in Borrables)
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar("Borrando", AssetDatabase.GetAssetPath(dep), ftot))
+                    {
+                        break;
+                    }
+                    // FileUtil.DeleteFileOrDirectory(AssetDatabase.GetAssetPath(dep));
+                    ftot += fsum;
+                }
+                EditorUtility.ClearProgressBar();
+            }
+        }
+        foreach (var dep in Borrables)
+        {
+            EditorGUILayout.ObjectField(dep, typeof(Object), false);
+        }
+        EditorGUILayout.EndScrollView();
+    }
+    void OnGUIDependibles()
+    {
+        scroll = EditorGUILayout.BeginScrollView(scroll);
         var nuevoInteres = EditorGUILayout.ObjectField(ObjetoDeMiInteres, typeof(Object), false);
-        EditorGUI.BeginDisabledGroup(detalleDeDependientes==null);
+        EditorGUI.BeginDisabledGroup(detalleDeDependientes == null);
         dependientesVisibles.target = EditorGUILayout.Foldout(dependientesVisibles.target, "Objetos dependientes");
         if (detalleDeDependientes != null)
         {
@@ -137,12 +219,12 @@ public class GuazuDependenciasExplorer : EditorWindow{
             EditorGUILayout.EndFadeGroup();
         }
         EditorGUI.EndDisabledGroup();
-        foreach (var dep in dependibles)
+        foreach (var dep in Dependibles)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.ObjectField(dep,typeof(Object),false);
+            EditorGUILayout.ObjectField(dep, typeof(Object), false);
             EditorGUI.BeginChangeCheck();
-            var val = GUILayout.Toggle(dep == ObjetoDeMiInteres,"Buscar dependientes","Button");
+            var val = GUILayout.Toggle(dep == ObjetoDeMiInteres, "Buscar dependientes", "Button");
             if (EditorGUI.EndChangeCheck() && val)
             {
                 nuevoInteres = dep;
@@ -179,6 +261,41 @@ public class GuazuDependenciasExplorer : EditorWindow{
         EditorUtility.ClearProgressBar();
         return new List<Object>(resultado);
     }*/
+
+    public static List<string> ExpandirSeleccionAsPaths(string[] inputGUIDS)
+    {
+        var outPaths = new List<string>();
+        return ExpandirSeleccionAsPaths(inputGUIDS, outPaths);
+    }
+    public static List<string> ExpandirSeleccionAsPaths(string[] inputGUIDS, List<string> outPaths)
+    {
+        foreach (var guid in inputGUIDS)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            if (AssetDatabase.IsValidFolder(path))
+            {
+                var encontrados = AssetDatabase.FindAssets("", new string[] { path });
+                ExpandirSeleccionAsPaths(encontrados, outPaths);
+            }
+            else if (!outPaths.Contains(path)) outPaths.Add(path);
+        }
+        return outPaths;
+    }
+
+    [MenuItem("Assets/Guazu/Seleccionar Borrables")]
+    public static void DisplayBorrables()
+    {
+        var dependenciasDeBuild = CollectDependenciesSegunBuildSettings();
+        var seleccionExpandida = ExpandirSeleccionAsPaths(Selection.assetGUIDs);
+        var pathsNoDependibles = new List<string>();
+        foreach (var path in seleccionExpandida)
+        {
+            if (string.IsNullOrEmpty(path)) continue;
+            if (AssetDatabase.IsValidFolder(path)) continue;
+            if (!dependenciasDeBuild.Contains(path)) pathsNoDependibles.Add(path);
+        }
+        if (pathsNoDependibles.Count > 0) MostrarBorrables(pathsNoDependibles);
+    }
 
     [MenuItem("Assets/Guazu/Chequear si es seguro borrar")]
     public static void DisplayProyectoDependeDe()
@@ -232,6 +349,7 @@ public class GuazuDependenciasExplorer : EditorWindow{
         else EditorUtility.DisplayDialog("Es borrable", "De esta seleccion no se depende pa la build, se puede borrar seguramente", "Piola");
     }
     [MenuItem("Assets/Guazu/Chequear si es seguro borrar", true)]
+    [MenuItem("Assets/Guazu/Seleccionar Borrables", true)]
     public static bool DisplayProyectoDependeDeValidator()
     {
         if (!Selection.activeObject) return false;
