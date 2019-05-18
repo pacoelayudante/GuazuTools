@@ -1,22 +1,26 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Guazu {
-    
+public static class Guazu
+{
+
     public static readonly Vector3 MirrorVector = new Vector3(-1f, 1f, 1f);
     public static readonly Vector3 FlipVector = new Vector3(1f, -1f, 1f);
 
-    public static Quaternion QuaternionRandom2D{
-        get{
-            return Quaternion.Euler(0, 0, Random.value * 360f);
+    public static Quaternion QuaternionRandom2D
+    {
+        get
+        {
+            return Quaternion.Euler(0, 0, UnityEngine.Random.value * 360f);
         }
-        }
+    }
 
     public static Quaternion QuaternionEuler(Vector2 vec2)
     {
         if (vec2.sqrMagnitude == 0) return Quaternion.identity;
-        else return Quaternion.Euler( 0, 0, Mathf.Atan2( vec2.y, vec2.x )*Mathf.Rad2Deg );
+        else return Quaternion.Euler(0, 0, Mathf.Atan2(vec2.y, vec2.x) * Mathf.Rad2Deg);
     }
 
     public static Quaternion MirrorQuaternion(Quaternion q)
@@ -32,7 +36,7 @@ public static class Guazu {
     }
     public static float AnguloDesdeVector2(Vector2 vector)
     {
-        return Mathf.Atan2(vector.y,vector.x);
+        return Mathf.Atan2(vector.y, vector.x);
     }
 
     public static Color BlancoClear
@@ -42,7 +46,7 @@ public static class Guazu {
 
     public static Color ColorClear(Color c)
     {
-        return ColorAlfa(c,0f);
+        return ColorAlfa(c, 0f);
     }
     public static Color ColorAlfa(Color c, float alfa)
     {
@@ -128,8 +132,36 @@ public static class Guazu {
     }
     public static IEnumerator DelayYEntonces(float t, System.Action yEntonces, bool unscaled = false)
     {
-        if(unscaled)yield return new WaitForSecondsRealtime(t);
+        if (unscaled) yield return new WaitForSecondsRealtime(t);
         else yield return new WaitForSeconds(t);
         yEntonces();
+    }
+
+    static Mesh quad;
+    public static Mesh Quad
+    {
+        get
+        {
+            if (quad == null) quad = GenerarQuad();
+            return quad;
+        }
+    }
+
+    public static Mesh GenerarQuad(bool cocinar = true)
+    {
+        Vector3[] vertices = new Vector3[]{
+            new Vector3(-.5f,-.5f,0f),new Vector3(.5f,-.5f,0f),new Vector3(-.5f,.5f,0f),new Vector3(.5f,.5f,0f)};
+        int[] triangulos = new int[] { 0, 1, 2, 1, 3, 2 };
+
+        Mesh m = new Mesh();
+        m.name = "Guazu Quad";
+        m.vertices = vertices;
+        m.triangles = triangulos;
+        m.RecalculateBounds();
+        m.RecalculateNormals();
+        m.RecalculateTangents();
+        if (cocinar) m.UploadMeshData(false);
+
+        return m;
     }
 }
