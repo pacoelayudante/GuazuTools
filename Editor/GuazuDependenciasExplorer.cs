@@ -21,7 +21,7 @@ public class GuazuDependenciasExplorer : EditorWindow
                 }
                 else
                 {
-                    detalleDeDependientes = BuscarDependientes(objetoInteres);
+                    detalleDeDependientes = BuscarDependientes(objetoInteres,busquedaRecursiva);
                     if (detalleDeDependientes == null)
                     {
                         dependientesVisibles.target = false;
@@ -36,7 +36,7 @@ public class GuazuDependenciasExplorer : EditorWindow
         }
     }
 
-    public static List<Object> BuscarDependientes(Object objetoInteres)
+    public static List<Object> BuscarDependientes(Object objetoInteres, bool busquedaRecursiva)
     {
         var resultado = new List<Object>();
         var pathDeInteres = AssetDatabase.GetAssetPath(objetoInteres);
@@ -85,7 +85,7 @@ public class GuazuDependenciasExplorer : EditorWindow
                         }
                         //var prefabDepends = EditorUtility.CollectDependencies(new Object[] { prefabEnEscena });
                         //if (System.Array.Exists(prefabDepends, cadaUno => cadaUno.Equals(objetoInteres))) resultado.Add(prefabEnEscena);
-                        var prefabDependsPath = AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(prefabEnEscena));
+                        var prefabDependsPath = AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(prefabEnEscena),busquedaRecursiva);
                         if (System.Array.Exists(prefabDependsPath, cadaUno => cadaUno.Equals(pathDeInteres))) resultado.Add(prefabEnEscena);
                     }
                 }
@@ -131,6 +131,7 @@ public class GuazuDependenciasExplorer : EditorWindow
     List<Object> borrables = null;
     List<Object> detalleDeDependientes = null;
     Vector2 scroll;
+    bool busquedaRecursiva = true;
 
     private void OnEnable()
     {
@@ -200,6 +201,7 @@ public class GuazuDependenciasExplorer : EditorWindow
     void OnGUIDependibles()
     {
         scroll = EditorGUILayout.BeginScrollView(scroll);
+        busquedaRecursiva = EditorGUILayout.Toggle("busquedaRecursiva",busquedaRecursiva);
         var nuevoInteres = EditorGUILayout.ObjectField(ObjetoDeMiInteres, typeof(Object), false);
         EditorGUI.BeginDisabledGroup(detalleDeDependientes == null);
         dependientesVisibles.target = EditorGUILayout.Foldout(dependientesVisibles.target, "Objetos dependientes");
