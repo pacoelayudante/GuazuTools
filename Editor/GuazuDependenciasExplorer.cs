@@ -210,6 +210,15 @@ public class GuazuDependenciasExplorer : EditorWindow
                 if (detalleDeDependientes.Count == 0) GUILayout.Label("Nadie depende de este objeto");
                 else
                 {
+                    if(nuevoInteres && GUILayout.Button("Exportar Lista")){
+                        var url = EditorUtility.SaveFilePanelInProject("exportar","dependientes de "+nuevoInteres.name,"asset","guardar como");
+                        if(!string.IsNullOrEmpty(url)){
+                            var lista = ScriptableObject.CreateInstance<SimpleListaDeReferencias>();
+                            lista.referencias = detalleDeDependientes;
+                            AssetDatabase.CreateAsset(lista,url);
+                            EditorGUIUtility.ExitGUI();
+                        }
+                    }
                     foreach (var dep in detalleDeDependientes)
                     {
                         EditorGUILayout.ObjectField(dep, typeof(Object), false);
