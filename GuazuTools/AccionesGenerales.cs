@@ -9,6 +9,10 @@ public class AccionesGenerales : MonoBehaviour {
     }
     public void Spawnear(GameObject go)
     {
+        if (go) Instantiate(go,transform.position,transform.rotation).SetActive(true);
+    }
+    public void SpawnearSinActivar(GameObject go)
+    {
         if (go) Instantiate(go,transform.position,transform.rotation);
     }
 }
