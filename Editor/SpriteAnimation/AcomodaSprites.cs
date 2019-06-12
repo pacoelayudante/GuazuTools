@@ -65,11 +65,11 @@ public class AcomodaSprites : EditorWindow
 
     void OnEnable()
     {
-        SceneView.onSceneGUIDelegate += this.OnSceneGUI;       
+        SceneView.duringSceneGui += this.OnSceneGUI;       
     }
     void OnDisable()
     {
-        SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+        SceneView.duringSceneGui -= this.OnSceneGUI;
     }
 
     void OnSceneGUI(SceneView sceneView)

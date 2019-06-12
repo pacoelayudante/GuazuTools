@@ -87,8 +87,8 @@ public class GuazuGizmoSpawner : MonoBehaviour
     [InitializeOnLoadMethod]
     static void Iniciar()
     {
-        SceneView.onSceneGUIDelegate -= Actualizar;
-        SceneView.onSceneGUIDelegate += Actualizar;
+        SceneView.duringSceneGui -= Actualizar;
+        SceneView.duringSceneGui += Actualizar;
     }
 
     static void Actualizar(SceneView sceneView)
