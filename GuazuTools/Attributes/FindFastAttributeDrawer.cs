@@ -77,6 +77,6 @@ public class FindFastAttribute : PropertyAttribute
             }
         }
     }
+#endif
 
 }
-#endif
