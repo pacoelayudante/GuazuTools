@@ -8,9 +8,12 @@ using UnityEditor;
 public class FindFastAttribute : PropertyAttribute
 {
     System.Type tipoABuscar = null;
-    public FindFastAttribute(System.Type tipo)
+    bool deChildren;
+    public FindFastAttribute(System.Type tipo):this(tipo,false){}
+    public FindFastAttribute(System.Type tipo, bool deChildren)
     {
         tipoABuscar = tipo;
+        this.deChildren = deChildren;
     }
 
 #if UNITY_EDITOR
@@ -19,20 +22,25 @@ public class FindFastAttribute : PropertyAttribute
     {
         readonly GUIContent contErrorPropTipo = new GUIContent("<!>", "Solo funciona con campos de refencia a objetos");
         readonly GUIContent contErrorTipoNull = new GUIContent("<!>", "El tipo pasado al atributo no puede ser null");
+        readonly GUIContent botBuscaChilds = new GUIContent("Q", "Buscar usando GetComponentInChildren");
         readonly GUIContent[] listaVacia = new GUIContent[] {new GUIContent( "","No hay objetos de este tipo en escena" )};
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            var attr = attribute as FindFastAttribute;
+
             var botPos = position;
             botPos.width = EditorGUIUtility.singleLineHeight * 2f;
             position.width -= botPos.width;
             botPos.x += position.width;
+            if(attr.deChildren){
+                position.width -= botPos.width;
+            }
 
             EditorGUI.PropertyField(position, property, label);
 
             if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                var attr = attribute as FindFastAttribute;
                 var tipo = attr.tipoABuscar;
                 if (tipo == null) GUI.Label(botPos, contErrorTipoNull);
                 else
@@ -70,10 +78,29 @@ public class FindFastAttribute : PropertyAttribute
                         }
                     }
                 }
+
+                if(attr.deChildren){
+                    botPos.x -= botPos.width;
+                    EditorGUI.BeginDisabledGroup(tipo == null || property.serializedObject.isEditingMultipleObjects);
+                    if (GUI.Button(botPos,botBuscaChilds)){
+                        var comp = property.serializedObject.targetObject as Component;
+                        if(comp){
+                            property.objectReferenceValue = comp.GetComponentInChildren(tipo,true);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
+                    }
+                    EditorGUI.EndDisabledGroup();
+                }
             }
             else
             {
                 GUI.Label(botPos, contErrorPropTipo);
+                if(attr.deChildren){
+                    botPos.x -= botPos.width;
+                    EditorGUI.BeginDisabledGroup(true);
+                    GUI.Button(botPos,botBuscaChilds);
+                    EditorGUI.EndDisabledGroup();
+                }
             }
         }
     }
