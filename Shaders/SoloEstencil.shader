@@ -2,16 +2,16 @@
 {
 	Properties
 	{
-        [Enum(UnityEngine.Rendering.CullMode)]_Cull ("Cull Mode", Int) = 0
-        [MaterialToggle]_ZWrite ("Z Write", Int) = 0
-        [Enum(UnityEngine.Rendering.CompareFunction)]_ZTest ("Z Test", Int) = 8
+        [Enum(UnityEngine.Rendering.CullMode)]_Cull ("Cull Mode", Int) = 2
+        [MaterialToggle]_ZWrite ("Z Write", Int) = 1
+        [Enum(UnityEngine.Rendering.CompareFunction)]_ZTest ("Z Test", Int) = 4
         [Enum(UnityEngine.Rendering.CompareFunction)]_StencilComp ("Stencil Comparison", Int) = 8
-        [MaskFlagsDrawer]_Stencil ("Stencil ID", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)]_StencilOp ("Stencil Operation", Int) = 0
+        [MaskFlagsDrawer]_Stencil ("Stencil Ref Value", Int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_StencilOp ("Stencil Pass Op", Int) = 0
         [MaskFlagsDrawer]_StencilWriteMask ("Stencil Write Mask", Int) = 255
         [MaskFlagsDrawer]_StencilReadMask ("Stencil Read Mask", Int) = 255
-        [Enum(UnityEngine.Rendering.StencilOp)]_StencilFail ("Stencil Fail Operation", Int) = 255
-        [Enum(UnityEngine.Rendering.StencilOp)]_StencilZFail ("Stencil ZFail Operation", Int) = 255
+        [Enum(UnityEngine.Rendering.StencilOp)]_StencilFail ("Stencil Fail Op", Int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_StencilZFail ("Stencil ZFail Op", Int) = 0
 	}
 	SubShader
 	{
@@ -30,7 +30,7 @@
 		Tags { "RenderType"="Opaque" "Queue"="Background"}
 		ZWrite [_ZWrite]
 		ZTest [_ZTest]
-		Blend Zero One
+		Blend Off
 		Cull [_Cull]
 
 		Pass

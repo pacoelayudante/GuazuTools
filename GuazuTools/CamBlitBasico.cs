@@ -9,8 +9,6 @@ public class CamBlitBasico : MonoBehaviour
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        // Copy the source Render Texture to the destination,
-        // applying the material along the way.
-        if(material)Graphics.Blit(source, destination, material);
+        if(material) Graphics.Blit(source, destination, material);
     }
 }
