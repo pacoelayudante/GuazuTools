@@ -34,6 +34,7 @@ Shader "Sprites/Blend Generico"
         Lighting Off
         ZWrite Off
         Blend [_BlendSrc] [_BlendDst]
+        BlendOp [_BlendOp]
 
         Pass
         {
