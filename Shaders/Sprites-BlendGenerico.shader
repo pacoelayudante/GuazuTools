@@ -16,6 +16,7 @@ Shader "Sprites/Blend Generico"
         [PerRendererData] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
 		[Enum(UnityEngine.Rendering.BlendMode)] _BlendSrc("Blend Source", Int)=1
 		[Enum(UnityEngine.Rendering.BlendMode)] _BlendDst("Blend Dest",Int)=10
+		[Enum(UnityEngine.Rendering.BlendOp)] _BlendOp("Blend Operation",Int)=0
     }
 
     SubShader
