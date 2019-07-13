@@ -164,4 +164,51 @@ public static class Guazu
 
         return m;
     }
+
+    public static Rect RectSuperPosicion(Rect a, Rect b, bool amplitudMinimaCero = true)
+    {
+        var minX = Mathf.Max(a.xMin, b.xMin);
+        var maxX = Mathf.Min(a.xMax, b.xMax);
+        if (amplitudMinimaCero && minX > maxX) minX = maxX = (minX + maxX) / 2f;
+
+        var minY = Mathf.Max(a.yMin, b.yMin);
+        var maxY = Mathf.Min(a.yMax, b.yMax);
+        if (amplitudMinimaCero && minY > maxY) minY = maxY = (minX + maxY) / 2f;
+
+        return Rect.MinMaxRect(minX, minY, maxX, maxY);
+    }
+    public static List<Rect> RectSustraccion(Rect inicial, Rect sustraido)
+    {
+        var resultado = new List<Rect>();
+        if (inicial.Overlaps(sustraido))
+        {
+            if (sustraido.Contains(inicial.min)&&sustraido.Contains(inicial.max)){
+                //en este caso, la sutraccion abarca y contiene a todo el rect inicial
+                return resultado;
+            }
+            if (inicial.xMin < sustraido.xMin)
+            {
+                resultado.Add( Rect.MinMaxRect(inicial.xMin,inicial.yMin,sustraido.xMin,inicial.yMax) );
+            }
+            if(inicial.xMax > sustraido.xMax)
+            {
+                resultado.Add( Rect.MinMaxRect(sustraido.xMax,inicial.yMin,inicial.xMax,inicial.yMax) );
+            }
+            inicial .xMin = Mathf.Max(inicial.xMin,sustraido.xMin);
+            inicial .xMax = Mathf.Min(inicial.xMax,sustraido.xMax);
+            if (inicial.yMin < sustraido.yMin)
+            {
+                resultado.Add( Rect.MinMaxRect(inicial.xMin,inicial.yMin,inicial.xMax,sustraido.yMin) );
+            }
+            if(inicial.yMax > sustraido.yMax)
+            {
+                resultado.Add( Rect.MinMaxRect(inicial.xMin,sustraido.yMax,inicial.xMax,inicial.yMax) );
+            }
+        }
+        else
+        {// NO HAY OVERLAP
+            resultado.Add(inicial);
+        }
+        return resultado;
+    }
 }
