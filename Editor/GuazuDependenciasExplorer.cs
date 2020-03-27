@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.AnimatedValues;
@@ -6,6 +6,11 @@ using UnityEditor;
 
 public class GuazuDependenciasExplorer : EditorWindow
 {
+    [System.Serializable]
+    public class SimpleListaDeReferencias : ScriptableObject
+{
+    public List<Object> referencias;
+}
     Object ObjetoDeMiInteres
     {
         get { return objetoInteres; }
